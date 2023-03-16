@@ -1,0 +1,10 @@
+[libraries]
+# Place here repository links to find library updates
+google_maven = "https://dl.google.com/dl/android/maven2/"
+maven_central = "https://repo.maven.apache.org/maven2/"
+# Repository with authentication
+# RepoWithAuth = { address = "https://...", user = "username", password = "password" }
+
+[plugins]
+# Place here repository links to find plugin updates
+gradle_plugin_portal = "https://plugins.gradle.org/m2/"

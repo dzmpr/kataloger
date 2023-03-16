@@ -1,4 +1,9 @@
-class Library:
-    def __init__(self, name: str, version: str):
-        self.name = name
-        self.version = version
+from data.Artifact import Artifact
+
+
+class Library(Artifact):
+    def __init__(self, name: str, coordinates: str, version: str):
+        super().__init__(name, coordinates, version)
+
+    def to_path(self) -> str:
+        return self.coordinates.replace(".", "/").replace(":", "/")

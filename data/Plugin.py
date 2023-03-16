@@ -1,4 +1,9 @@
-class Plugin:
-    def __init__(self, group_id: str, version: str):
-        self.group_id = group_id
-        self.version = version
+from data.Artifact import Artifact
+
+
+class Plugin(Artifact):
+    def __init__(self, name: str, coordinates: str, version: str):
+        super().__init__(name, coordinates, version)
+
+    def to_path(self) -> str:
+        return f"{self.coordinates.replace('.', '/')}/{self.coordinates}.gradle.plugin"
