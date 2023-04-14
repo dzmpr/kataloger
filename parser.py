@@ -8,12 +8,14 @@ from data.Repository import Repository
 def load_repositories() -> tuple[list[Repository], list[Repository]]:
     library_repositories: list[Repository] = list()
     plugin_repositories: list[Repository] = list()
+
     repositories_data = load_toml_to_dict(path="./repositories.toml")
     if "libraries" in repositories_data:
-        library_repositories = parse_repositories(repositories_data["libraries"].items())
+        library_repositories = parse_repositories(list(repositories_data["libraries"].items()))
     if "plugins" in repositories_data:
-        plugin_repositories = parse_repositories(repositories_data["plugins"].items())
-    if not len(library_repositories) and not len(plugin_repositories):
+        plugin_repositories = parse_repositories(list(repositories_data["plugins"].items()))
+
+    if not library_repositories and not plugin_repositories:
         raise Exception("No repositories provided!")
     return library_repositories, plugin_repositories
 
@@ -49,6 +51,7 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
             case _:
                 raise ValueError("Unexpected repository data.")
         repositories.append(repository)
+
     return repositories
 
 
