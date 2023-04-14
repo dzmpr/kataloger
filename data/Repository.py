@@ -10,3 +10,6 @@ class Repository:
         self.address = address
         self.user = user
         self.password = password
+
+    def requires_authorization(self) -> bool:
+        return self.user is not None and self.password is not None

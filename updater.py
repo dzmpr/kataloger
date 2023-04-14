@@ -36,7 +36,7 @@ def check_updates(
 def handle_artifact(artifact: Artifact, repositories: list[Repository]) -> AvailableUpdate | None:
     artifact_path = artifact.to_path()
     for repository in repositories:
-        version_data = load_artifact_metadata(repository.address, artifact_path)
+        version_data = load_artifact_metadata(repository, artifact_path)
         if version_data is not None:
             if version_data.latest_version != artifact.version:
                 return AvailableUpdate(artifact.name, repository.name, artifact.version, version_data.latest_version)
@@ -45,14 +45,21 @@ def handle_artifact(artifact: Artifact, repositories: list[Repository]) -> Avail
     return None
 
 
-def load_artifact_metadata(repository_url: str, artifact_path: str) -> ArtifactMetadata | None:
-    metadata_url = f"{repository_url}{artifact_path}/maven-metadata.xml"
-    response = requests.get(url=metadata_url)
+def load_artifact_metadata(repository: Repository, artifact_path: str) -> ArtifactMetadata | None:
+    if repository.requires_authorization():
+        auth = (repository.user, repository.password)
+    else:
+        auth = None
+
+    metadata_url = f"{repository.address}{artifact_path}/maven-metadata.xml"
+    response = requests.get(url=metadata_url, auth=auth)
+
     if response.status_code != 200:
         return None
     else:
         version_data = xmltodict.parse(response.text)["metadata"]["versioning"]
         return ArtifactMetadata(
+            repository=repository,
             latest_version=version_data["latest"],
             release_version=version_data["release"],
             versions=version_data["versions"]["version"],

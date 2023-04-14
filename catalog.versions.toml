@@ -1,0 +1,16 @@
+# Sample versions catalog
+
+[versions]
+
+material="1.0.0"
+fragment = "1.5.0"
+crashlytics = "2.9.0"
+
+[libraries]
+
+material = { module = "com.google.android.material:material", version.ref = "material" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+
+[plugins]
+
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
