@@ -1,3 +1,5 @@
+import os.path
+
 import parser
 import updater
 from data.AvailableUpdate import AvailableUpdate
@@ -16,9 +18,15 @@ def print_updates(updates: list[AvailableUpdate]):
                   f"{update.current_version} => {update.available_version} ({update.repository_name})")
 
 
+def is_catalog_path_valid(path: str):
+    if not os.path.isfile(path):
+        raise Exception("Catalog not found!")
+
+
 if __name__ == '__main__':
     repositories = parser.load_repositories()
     catalog_path = input("Input path to catalog .toml file: ")
+    is_catalog_path_valid(catalog_path)
     libraries, plugins = parser.load_catalog(catalog_path=catalog_path)
     artifact_updates = updater.check_updates(repositories, libraries, plugins)
     print_updates(artifact_updates)
