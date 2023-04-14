@@ -24,9 +24,10 @@ def is_catalog_path_valid(path: str):
 
 
 if __name__ == '__main__':
-    repositories = parser.load_repositories()
+    library_repositories, plugin_repositories = parser.load_repositories()
     catalog_path = input("Input path to catalog .toml file: ")
     is_catalog_path_valid(catalog_path)
     libraries, plugins = parser.load_catalog(catalog_path=catalog_path)
-    artifact_updates = updater.check_updates(repositories, libraries, plugins)
-    print_updates(artifact_updates)
+    library_updates = updater.check_updates(library_repositories, libraries)
+    plugin_updates = updater.check_updates(plugin_repositories, plugins)
+    print_updates(library_updates + plugin_updates)

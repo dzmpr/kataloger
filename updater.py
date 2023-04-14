@@ -6,25 +6,21 @@ import xmltodict as xmltodict
 from data.Artifact import Artifact
 from data.ArtifactMetadata import ArtifactMetadata
 from data.AvailableUpdate import AvailableUpdate
-from data.Library import Library
-from data.Plugin import Plugin
 from data.Repository import Repository
 
 
 def check_updates(
-    repositories: tuple[list[Repository], list[Repository]],
-    libraries: list[Library],
-    plugins: list[Plugin],
+    repositories: list[Repository],
+    artifacts: list[Artifact],
 ) -> list[AvailableUpdate]:
-    library_repositories, plugin_repositories = repositories
+    if not repositories or not artifacts:
+        return list()
+
     available_updates = list()
     with ThreadPoolExecutor(max_workers=80) as executor:
         futures = list()
-        for library in libraries:
-            future = executor.submit(handle_artifact, library, library_repositories)
-            futures.append(future)
-        for plugin in plugins:
-            future = executor.submit(handle_artifact, plugin, plugin_repositories)
+        for artifact in artifacts:
+            future = executor.submit(handle_artifact, artifact, repositories)
             futures.append(future)
 
         for future in as_completed(futures):
