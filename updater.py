@@ -5,23 +5,20 @@ import xmltodict as xmltodict
 
 from data.Artifact import Artifact
 from data.ArtifactMetadata import ArtifactMetadata
-from data.AvailableUpdate import AvailableUpdate
+from data.ArtifactUpdateInfo import ArtifactUpdateInfo
 from data.Repository import Repository
 
 
 def check_updates(
     repositories: list[Repository],
     artifacts: list[Artifact],
-) -> list[AvailableUpdate]:
+) -> list[ArtifactUpdateInfo]:
     if not repositories or not artifacts:
         return list()
 
     available_updates = list()
     with ThreadPoolExecutor(max_workers=80) as executor:
-        futures = list()
-        for artifact in artifacts:
-            future = executor.submit(handle_artifact, artifact, repositories)
-            futures.append(future)
+        futures = [executor.submit(handle_artifact, artifact, repositories) for artifact in artifacts]
 
         for future in as_completed(futures):
             if (result := future.result()) is not None:
@@ -29,16 +26,18 @@ def check_updates(
     return available_updates
 
 
-def handle_artifact(artifact: Artifact, repositories: list[Repository]) -> AvailableUpdate | None:
+def handle_artifact(artifact: Artifact, repositories: list[Repository]) -> ArtifactUpdateInfo | None:
     artifact_path = artifact.to_path()
+    update_candidates = list()
     for repository in repositories:
         version_data = load_artifact_metadata(repository, artifact_path)
         if version_data is not None:
-            if version_data.latest_version != artifact.version:
-                return AvailableUpdate(artifact.name, repository.name, artifact.version, version_data.latest_version)
-            else:
-                return None
-    return None
+            update_candidates.append(version_data)
+
+    if not update_candidates:
+        return None
+    else:
+        return ArtifactUpdateInfo(artifact.name, artifact.version, update_candidates)
 
 
 def load_artifact_metadata(repository: Repository, artifact_path: str) -> ArtifactMetadata | None:

@@ -2,10 +2,10 @@ import os.path
 
 import parser
 import updater
-from data.AvailableUpdate import AvailableUpdate
+from data.ArtifactUpdateInfo import ArtifactUpdateInfo
 
 
-def print_updates(updates: list[AvailableUpdate]):
+def print_updates(updates: list[ArtifactUpdateInfo]):
     if len(updates) == 0:
         print("Your catalog is up to date!")
     else:
@@ -14,8 +14,9 @@ def print_updates(updates: list[AvailableUpdate]):
         print("Here are updates that I found:")
         for update in updates:
             dot_count = max_artifact_name_len - len(update.artifact_name) + 3
-            print(f"{update.artifact_name} {'.' * dot_count} " +
-                  f"{update.current_version} => {update.available_version} ({update.repository_name})")
+            print(f"{update.artifact_name} {'.' * dot_count} "
+                  f"{update.current_version} => {update.update_candidates[0].latest_version} "
+                  f"({update.update_candidates[0].repository.name})")
 
 
 def is_catalog_path_valid(path: str):
