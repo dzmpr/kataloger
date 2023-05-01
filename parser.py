@@ -5,11 +5,11 @@ from data.Plugin import Plugin
 from data.Repository import Repository
 
 
-def load_repositories() -> tuple[list[Repository], list[Repository]]:
+def load_repositories(repositories_path: str) -> tuple[list[Repository], list[Repository]]:
     library_repositories: list[Repository] = list()
     plugin_repositories: list[Repository] = list()
 
-    repositories_data = load_toml_to_dict(path="./repositories.toml")
+    repositories_data = load_toml_to_dict(path=repositories_path)
     if "libraries" in repositories_data:
         library_repositories = parse_repositories(list(repositories_data["libraries"].items()))
     if "plugins" in repositories_data:
