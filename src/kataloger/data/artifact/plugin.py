@@ -1,4 +1,4 @@
-from data.Artifact import Artifact
+from kataloger.data.artifact.artifact import Artifact
 
 
 class Plugin(Artifact):

@@ -1,13 +1,14 @@
 import tomllib
 
-from data.Library import Library
-from data.Plugin import Plugin
-from data.Repository import Repository
+from kataloger.data.artifact.library import Library
+from kataloger.data.artifact.plugin import Plugin
+from kataloger.data.repository import Repository
+from kataloger.helpers.log_helpers import log_warning
 
 
 def load_repositories(repositories_path: str) -> tuple[list[Repository], list[Repository]]:
-    library_repositories: list[Repository] = list()
-    plugin_repositories: list[Repository] = list()
+    library_repositories: list[Repository] = []
+    plugin_repositories: list[Repository] = []
 
     repositories_data = load_toml_to_dict(path=repositories_path)
     if "libraries" in repositories_data:
@@ -20,21 +21,22 @@ def load_repositories(repositories_path: str) -> tuple[list[Repository], list[Re
     return library_repositories, plugin_repositories
 
 
-def load_catalog(catalog_path: str) -> tuple[list[Library], list[Plugin]]:
+def load_catalog(catalog_path: str, verbose: bool) -> tuple[list[Library], list[Plugin]]:
     catalog = load_toml_to_dict(catalog_path)
 
+    # TODO: catalog can not contain versions section
     if "versions" not in catalog or ("libraries" not in catalog and "plugins" not in catalog):
         raise Exception("Incorrect catalog format!")
 
-    versions: dict = catalog.pop("versions")
-    libraries = parse_libraries(catalog, versions)
-    plugins = parse_plugins(catalog, versions)
+    versions: dict[str, str] = catalog.pop("versions")
+    libraries = parse_libraries(catalog, versions, verbose)
+    plugins = parse_plugins(catalog, versions, verbose)
 
     return libraries, plugins
 
 
 def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
-    repositories = list()
+    repositories = []
     for repository_data in repositories_data:
         match repository_data:
             case (str(name), str(address)):
@@ -55,30 +57,33 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
     return repositories
 
 
-def parse_libraries(catalog: dict[str, str | dict], versions: dict) -> list[Library]:
-    libraries = list()
+def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: bool) -> list[Library]:
+    libraries = []
 
     if "libraries" not in catalog:
         return libraries
 
     for name, library in catalog["libraries"].items():
         if "version" not in library:
-            print(f"W: Library \"{library['module']}\" has no version in catalog.")
+            if verbose:
+                log_warning(f"Library \"{library['module']}\" has no version in catalog.")
             continue
+        # TODO: Support not only 'version.ref', version can be inlined
         libraries.append(Library(name=name, coordinates=library["module"], version=versions[library["version"]["ref"]]))
     return libraries
 
 
-def parse_plugins(catalog: dict[str, str | dict], versions: dict) -> list[Plugin]:
-    plugins = list()
-
+def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool) -> list[Plugin]:
+    plugins = []
     if "plugins" not in catalog:
         return plugins
 
     for name, plugin in catalog["plugins"].items():
         if "version" not in plugin:
-            print(f"W: Plugin \"{plugin['id']}\" has no version in catalog.")
+            if verbose:
+                log_warning(f"Plugin \"{plugin['id']}\" has no version in catalog.")
             continue
+        # TODO: Support not only 'version.ref', version can be inlined
         plugins.append(Plugin(name=name, coordinates=plugin["id"], version=versions[plugin["version"]["ref"]]))
     return plugins
 
