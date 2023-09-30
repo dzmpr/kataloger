@@ -1,12 +1,14 @@
 import tomllib
+from pathlib import Path
 
 from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.repository import Repository
+from kataloger.execptions.kataloger_parse_exception import KatalogerParseException
 from kataloger.helpers.log_helpers import log_warning
 
 
-def load_repositories(repositories_path: str) -> tuple[list[Repository], list[Repository]]:
+def load_repositories(repositories_path: Path) -> tuple[list[Repository], list[Repository]]:
     library_repositories: list[Repository] = []
     plugin_repositories: list[Repository] = []
 
@@ -16,18 +18,16 @@ def load_repositories(repositories_path: str) -> tuple[list[Repository], list[Re
     if "plugins" in repositories_data:
         plugin_repositories = parse_repositories(list(repositories_data["plugins"].items()))
 
-    if not library_repositories and not plugin_repositories:
-        raise Exception("No repositories provided!")
     return library_repositories, plugin_repositories
 
 
-def load_catalog(catalog_path: str, verbose: bool) -> tuple[list[Library], list[Plugin]]:
+def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list[Plugin]]:
     catalog = load_toml_to_dict(catalog_path)
 
-    # TODO: catalog can not contain versions section
-    if "versions" not in catalog or ("libraries" not in catalog and "plugins" not in catalog):
-        raise Exception("Incorrect catalog format!")
+    if "libraries" not in catalog and "plugins" not in catalog:
+        raise KatalogerParseException(message="Catalog has no libraries and plugins to update.")
 
+    # TODO: catalog can not contain versions section
     versions: dict[str, str] = catalog.pop("versions")
     libraries = parse_libraries(catalog, versions, verbose)
     plugins = parse_plugins(catalog, versions, verbose)
@@ -43,7 +43,7 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
                 repository = Repository(name, address)
             case (str(name), dict(credentials)):
                 if "address" not in credentials or "user" not in credentials or "password" not in credentials:
-                    raise Exception(f"Credentials for \"{name}\" repository is incomplete!")
+                    raise KatalogerParseException(message=f"Credentials for \"{name}\" repository is incomplete!")
                 repository = Repository(
                     name=name,
                     address=credentials["address"],
@@ -51,7 +51,7 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
                     password=credentials["password"],
                 )
             case _:
-                raise ValueError("Unexpected repository data.")
+                raise KatalogerParseException(message="Unexpected repository data.")
         repositories.append(repository)
 
     return repositories
@@ -88,6 +88,6 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
     return plugins
 
 
-def load_toml_to_dict(path: str) -> dict[str, str | dict]:
+def load_toml_to_dict(path: Path) -> dict[str, str | dict]:
     with open(path, 'rb') as file:
         return tomllib.load(file)

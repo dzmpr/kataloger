@@ -1,20 +1,25 @@
+from pathlib import Path
 from typing import Optional, Self
 
 from kataloger.catalog_updater import CatalogUpdater
 from kataloger.data.repository import Repository
+from kataloger.execptions.kataloger_configuration_exception import KatalogerConfigurationException
 from kataloger.helpers.toml_parse_helpers import load_repositories
 from kataloger.update_resolver.base.update_resolver import UpdateResolver
 
 
 class CatalogUpdaterBuilder:
 
-    repositories_path: Optional[str] = None
+    repositories_path: Optional[Path] = None
     library_repositories: list[Repository] = []
     plugin_repositories: list[Repository] = []
     update_resolvers: list[UpdateResolver] = []
     verbose: bool = False
 
-    def set_repositories_path(self, path: str) -> Self:
+    def set_repositories_path(self, path: Path) -> Self:
+        if not (path.exists() and path.is_file()):
+            raise KatalogerConfigurationException(message=f"Incorrect path to repositories: {path}.")
+
         self.repositories_path = path
         return self
 
@@ -39,8 +44,7 @@ class CatalogUpdaterBuilder:
         return self
 
     def build(self) -> CatalogUpdater:
-        # TODO: Safely handle None repositories_path
-        if path := self.repositories_path.strip():
+        if path := self.repositories_path:
             (library_repos, plugin_repos) = load_repositories(path)
             self.library_repositories.extend(library_repos)
             self.plugin_repositories.extend(plugin_repos)
