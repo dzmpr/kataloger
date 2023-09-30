@@ -27,8 +27,7 @@ def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list
     if "libraries" not in catalog and "plugins" not in catalog:
         raise KatalogerParseException(message="Catalog has no libraries and plugins to update.")
 
-    # TODO: catalog can not contain versions section
-    versions: dict[str, str] = catalog.pop("versions")
+    versions: dict[str, str] = catalog.pop("versions", {})
     libraries = parse_libraries(catalog, versions, verbose)
     plugins = parse_plugins(catalog, versions, verbose)
 
@@ -41,14 +40,12 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
         match repository_data:
             case (str(name), str(address)):
                 repository = Repository(name, address)
-            case (str(name), dict(credentials)):
-                if "address" not in credentials or "user" not in credentials or "password" not in credentials:
-                    raise KatalogerParseException(message=f"Credentials for \"{name}\" repository is incomplete!")
+            case (str(name), {"address": str(address), "user": str(user), "password": str(password)}):
                 repository = Repository(
                     name=name,
-                    address=credentials["address"],
-                    user=credentials["user"],
-                    password=credentials["password"],
+                    address=address,
+                    user=user,
+                    password=password,
                 )
             case _:
                 raise KatalogerParseException(message="Unexpected repository data.")
@@ -64,12 +61,30 @@ def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: boo
         return libraries
 
     for name, library in catalog["libraries"].items():
-        if "version" not in library:
-            if verbose:
-                log_warning(f"Library \"{library['module']}\" has no version in catalog.")
-            continue
-        # TODO: Support not only 'version.ref', version can be inlined
-        libraries.append(Library(name=name, coordinates=library["module"], version=versions[library["version"]["ref"]]))
+        match library:
+            case {"module": str(module), "version": str(version)}:
+                library = Library(
+                    name=name,
+                    coordinates=module,
+                    version=version,
+                )
+                libraries.append(library)
+            case {"module": str(module), "version": {"ref": str(ref)}}:
+                if not (version := versions.get(ref)):
+                    raise KatalogerParseException(f"Version for \"{name}\" not specified by reference \"{ref}\".")
+
+                library = Library(
+                    name=name,
+                    coordinates=module,
+                    version=version,
+                )
+                libraries.append(library)
+            case {"module": str(module)}:
+                if verbose:
+                    log_warning(f"Library \"{module}\" has no version in catalog.")
+            case _:
+                raise KatalogerParseException(f"Unknown library notation: {library}")
+
     return libraries
 
 
@@ -79,12 +94,30 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
         return plugins
 
     for name, plugin in catalog["plugins"].items():
-        if "version" not in plugin:
-            if verbose:
-                log_warning(f"Plugin \"{plugin['id']}\" has no version in catalog.")
-            continue
-        # TODO: Support not only 'version.ref', version can be inlined
-        plugins.append(Plugin(name=name, coordinates=plugin["id"], version=versions[plugin["version"]["ref"]]))
+        match plugin:
+            case {"id": str(plugin_id), "version": str(version)}:
+                plugin = Plugin(
+                    name=name,
+                    coordinates=plugin_id,
+                    version=version,
+                )
+                plugins.append(plugin)
+            case {"id": str(plugin_id), "version": {"ref": str(ref)}}:
+                if not (version := versions.get(ref)):
+                    raise KatalogerParseException(f"There is no version for \"{name}\" by key \"{ref}\".")
+
+                plugin = Plugin(
+                    name=name,
+                    coordinates=plugin_id,
+                    version=version,
+                )
+                plugins.append(plugin)
+            case {"id": str(plugin_id)}:
+                if verbose:
+                    log_warning(f"Plugin \"{plugin_id}\" has no version in catalog.")
+            case _:
+                raise KatalogerParseException(f"Unknown plugin notation: {plugin}")
+
     return plugins
 
 

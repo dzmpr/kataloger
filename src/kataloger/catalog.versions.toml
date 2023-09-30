@@ -10,6 +10,7 @@ crashlytics = "2.9.0"
 
 material = { module = "com.google.android.material:material", version.ref = "material" }
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+dagger = { module = "com.google.dagger:dagger", version = "2.48" }
 
 [plugins]
 
