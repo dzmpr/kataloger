@@ -32,3 +32,6 @@ kataloger = "kataloger.__main__:main"
 
 [project.urls]
 "GitHub" = "https://github.com/dzmpr/kataloger"
+
+[tool.pytest.ini_options]
+pythonpath = "src/"
