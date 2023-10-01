@@ -11,8 +11,13 @@ from kataloger.update_resolver.universal.version_factory import VersionFactory
 
 class UniversalUpdateResolver(UpdateResolver):
 
-    def __init__(self, version_factories: list[VersionFactory[Version]]):
+    def __init__(
+        self,
+        version_factories: list[VersionFactory[Version]],
+        suggest_unstable_updates: bool,
+    ):
         self.version_factories = version_factories
+        self.suggest_unstable_updates = suggest_unstable_updates
 
     def resolve(
         self,
@@ -50,13 +55,13 @@ class UniversalUpdateResolver(UpdateResolver):
             return UpdateResolution.CANT_RESOLVE, None
 
         artifact_version = version_factory.create(current_version)
-        suggest_betas = artifact_version.is_pre_release()
+        suggest_unstable = self.suggest_unstable_updates or artifact_version.is_pre_release()
         for version in reversed(repository_metadata.metadata.versions):
             if not version_factory.can_create(version):
                 return UpdateResolution.CANT_RESOLVE, None
 
             update_version = version_factory.create(version)
-            if update_version.is_pre_release() and not suggest_betas:
+            if update_version.is_pre_release() and not suggest_unstable:
                 continue
 
             if artifact_version == update_version:
