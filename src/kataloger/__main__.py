@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import Optional
 
 import asyncio
 
@@ -15,7 +16,7 @@ from kataloger.update_resolver.universal.universal_version_factory import Univer
 def parse_arguments() -> KatalogerConfiguration:
     parser = ArgumentParser(
         prog="kataloger",
-        usage="%(prog)s path_to_version_catalog [options]",
+        usage="%(prog)s [options]",
         description="A Python command-line utility to discover updates for your Gradle version catalogs.",
         allow_abbrev=False,
         epilog="Visit project repository to get latest information."
@@ -25,16 +26,16 @@ def parse_arguments() -> KatalogerConfiguration:
         type=str,
         dest="catalog_path",
         metavar="path",
-        required=True,
-        help="Path to gradle version catalog.",
+        help="Path to gradle version catalog. If catalog path not provided script looking for version catalog in "
+             "current directory.",
     )
     parser.add_argument(
         "-rp", "--repositories-path",
         type=str,
         dest="repositories_path",
         metavar="path",
-        required=True,
-        help="Path to .toml file with repositories info.",
+        help="Path to .toml file with repositories info. If repositories path not provided script looking for "
+             "repositories file in current directory.",
     )
     parser.add_argument(
         "-v", "--verbose",
@@ -62,12 +63,36 @@ def parse_arguments() -> KatalogerConfiguration:
     arguments = parser.parse_args()
 
     return KatalogerConfiguration(
-        path_to_catalog=convert_to_path(arguments.catalog_path),
-        path_to_repositories=convert_to_path(arguments.repositories_path),
+        path_to_catalog=to_catalog_path(arguments.catalog_path),
+        path_to_repositories=to_repositories_path(arguments.repositories_path),
         verbose=arguments.verbose,
         suggest_unstable_updates=arguments.suggest_unstable_updates,
         fail_on_updates=arguments.fail_on_updates,
     )
+
+
+def to_catalog_path(path_string: Optional[str]) -> Path:
+    if path_string:
+        return convert_to_path(path_string)
+
+    catalog_candidate = Path.cwd() / "libs.versions.toml"
+    if not (catalog_candidate.exists() and catalog_candidate.is_file()):
+        raise KatalogerConfigurationException("libs.version.toml not found in current directory. Please specify path "
+                                              "to catalog with -p parameter.")
+
+    return catalog_candidate
+
+
+def to_repositories_path(path_string: Optional[str]) -> Path:
+    if path_string:
+        return convert_to_path(path_string)
+
+    repositories_candidate = Path.cwd() / "default.repositories.toml"
+    if not (repositories_candidate.exists() and repositories_candidate.is_file()):
+        raise KatalogerConfigurationException("default.repositories.toml not found in current directory. Please specify"
+                                              " path to repositories with -rp parameter.")
+
+    return repositories_candidate
 
 
 def convert_to_path(path_string: str) -> Path:
