@@ -40,3 +40,4 @@ Cataloger has convenient API (I did my best), so you can install it from pip and
 - [ ] Support check multiple catalogs
 - [ ] Support all notations in version catalog
 - [ ] Support advanced update configuration
+- [ ] Support Python <3.11

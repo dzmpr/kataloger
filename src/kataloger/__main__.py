@@ -5,6 +5,7 @@ from typing import Optional
 
 import asyncio
 
+from kataloger import __version__ as kataloger_version
 from kataloger.catalog_updater_builder import CatalogUpdaterBuilder
 from kataloger.data.kataloger_configuration import KatalogerConfiguration
 from kataloger.execptions.kataloger_configuration_exception import KatalogerConfigurationException
@@ -58,7 +59,7 @@ def parse_arguments() -> KatalogerConfiguration:
     parser.add_argument(
         "--version",
         action="version",
-        version=f"%(prog)s 0.0.1",  # TODO: to be read from single-source
+        version=f"%(prog)s {kataloger_version}",
     )
     arguments = parser.parse_args()
 
