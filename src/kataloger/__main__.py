@@ -59,7 +59,7 @@ def parse_arguments() -> KatalogerConfiguration:
     parser.add_argument(
         "--version",
         action="version",
-        version=f"%(prog)s {version(__package__ or __name__)}",
+        version=f"%(prog)s {get_kataloger_version()}",
     )
     arguments = parser.parse_args()
 
@@ -70,6 +70,13 @@ def parse_arguments() -> KatalogerConfiguration:
         suggest_unstable_updates=arguments.suggest_unstable_updates,
         fail_on_updates=arguments.fail_on_updates,
     )
+
+
+def get_kataloger_version() -> str:
+    if __name__ == '__main__':
+        return "indev"
+    else:
+        return version(__package__ or __name__)
 
 
 def to_catalog_path(path_string: Optional[str]) -> Path:

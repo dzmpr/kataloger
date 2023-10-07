@@ -36,6 +36,11 @@ class CatalogUpdater:
 
     async def get_catalog_updates(self, catalog_path: Path) -> list[ArtifactUpdate]:
         libraries, plugins = load_catalog(catalog_path, self.verbose)
+        if not (libraries or plugins):
+            if self.verbose:
+                log_warning(f"Catalog \"{catalog_path.name}\" is empty.")
+            return []
+
         library_updates, plugin_updates = await self.get_updates(libraries, plugins)
         return library_updates + plugin_updates
 

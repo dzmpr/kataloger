@@ -23,10 +23,6 @@ def load_repositories(repositories_path: Path) -> tuple[list[Repository], list[R
 
 def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list[Plugin]]:
     catalog = load_toml_to_dict(catalog_path)
-
-    if "libraries" not in catalog and "plugins" not in catalog:
-        raise KatalogerParseException(message="Catalog has no libraries and plugins to update.")
-
     versions: dict[str, str] = catalog.pop("versions", {})
     libraries = parse_libraries(catalog, versions, verbose)
     plugins = parse_plugins(catalog, versions, verbose)
@@ -56,7 +52,6 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
 
 def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: bool) -> list[Library]:
     libraries = []
-
     if "libraries" not in catalog:
         return libraries
 
@@ -123,4 +118,7 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
 
 def load_toml_to_dict(path: Path) -> dict[str, str | dict]:
     with open(path, 'rb') as file:
-        return tomllib.load(file)
+        try:
+            return tomllib.load(file)
+        except tomllib.TOMLDecodeError:
+            raise KatalogerParseException(f"Can't parse TOML in \"{path.name}\".")
