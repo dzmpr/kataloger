@@ -26,8 +26,8 @@ kataloger
 
 #### CLI options
 
-`-p [path]` or `--path [path]` — specifies path to gradle version catalog file. If no path provided kataloger try to find version catalog with default name `libs.versions.toml` in current working directory.  
-`-rp [path]` or `--repositories-path [path]` — specifies path to .toml file with repositories credentials where updates will be looked for. If no path provided kataloger try to find repositories file with default name `default.repositories.toml` in current working directory.  
+`-p [path]` or `--path [path]` — specifies path to gradle version catalog file. You can pass more than one version catalog path. If no path provided kataloger try to find version catalogs (files with extension `.versions.toml`) in current working directory.  
+`-rp [path]` or `--repositories-path [path]` — specifies path to .toml file with repositories credentials where updates will be looked for. If no path provided kataloger try to find default repositories file with name `default.repositories.toml` in current working directory.  
 `-v` or `--verbose` — if specified print more info to console.  
 `-u` or `--suggest-unstable` — if specified suggest artifact update from stable version to unstable.  
 `-f` or `--fail-on-updates` — if specified return non-zero exit code when at least one update found. Can be useful on CI.  
@@ -37,7 +37,7 @@ Cataloger has convenient API (I did my best), so you can install it from pip and
 
 ### Roadmap
 
-- [ ] Support check multiple catalogs
+- [x] Support check multiple catalogs
 - [ ] Support all notations in version catalog
 - [ ] Support advanced update configuration
 - [ ] Support Python <3.11

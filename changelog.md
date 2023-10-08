@@ -1,3 +1,3 @@
 ### Changelog
 
-* Initial release!🚀
+* Support update multiple gradle version catalogs.
