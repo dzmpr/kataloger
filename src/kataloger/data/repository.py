@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from yarl import URL
+
 
 @dataclass(frozen=True)
 class Repository:
     name: str
-    address: str
+    address: URL
     user: Optional[str] = None
     password: Optional[str] = None
 

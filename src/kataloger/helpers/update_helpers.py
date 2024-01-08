@@ -58,7 +58,7 @@ async def get_artifact_metadata(
     artifact: Artifact,
     verbose: bool,
 ) -> Optional[MetadataRepositoryInfo]:
-    metadata_url = f"{repository.address}{artifact.to_path()}/maven-metadata.xml"
+    metadata_url = repository.address / artifact.to_path() / "maven-metadata.xml"
     async with session.get(metadata_url) as response:
         if response.status != 200:
             return None

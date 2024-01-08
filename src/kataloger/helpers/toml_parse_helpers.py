@@ -1,6 +1,8 @@
 import tomllib
 from pathlib import Path
 
+from yarl import URL
+
 from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.repository import Repository
@@ -35,11 +37,11 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
     for repository_data in repositories_data:
         match repository_data:
             case (str(name), str(address)):
-                repository = Repository(name, address)
+                repository = Repository(name, URL(address))
             case (str(name), {"address": str(address), "user": str(user), "password": str(password)}):
                 repository = Repository(
                     name=name,
-                    address=address,
+                    address=URL(address),
                     user=user,
                     password=password,
                 )
