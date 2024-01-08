@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
 from importlib.metadata import version
+from importlib.resources import files, as_file
 from pathlib import Path
 from typing import Optional
 
@@ -96,11 +97,12 @@ def get_repositories_path(path_string: Optional[str]) -> Path:
         return str_to_path(path_string)
 
     repositories_candidate = Path.cwd() / "default.repositories.toml"
-    if not (repositories_candidate.exists() and repositories_candidate.is_file()):
-        raise KatalogerConfigurationException("default.repositories.toml not found in current directory. Please specify"
-                                              " path to repositories with -rp parameter.")
+    if repositories_candidate.exists() and repositories_candidate.is_file():
+        return repositories_candidate
 
-    return repositories_candidate
+    with as_file(files("kataloger").joinpath("default.repositories.toml")) as path:
+        bundled_repositories_path = path
+    return bundled_repositories_path
 
 
 def str_to_path(path_string: str) -> Path:

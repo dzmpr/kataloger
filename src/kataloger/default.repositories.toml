@@ -7,4 +7,6 @@ google_maven = "https://dl.google.com/dl/android/maven2/"
 
 [plugins]
 # Place here repository links to find plugin updates
+maven_central = "https://repo.maven.apache.org/maven2/"
+google_maven = "https://dl.google.com/dl/android/maven2/"
 gradle_plugin_portal = "https://plugins.gradle.org/m2/"

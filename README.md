@@ -1,9 +1,10 @@
 ## Kataloger
 
 
-[![Python version](https://img.shields.io/badge/python-3.11-blue.svg)](https://pypi.python.org/pypi/kataloger)
-[![Tests](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml)
 [![Latest version](https://img.shields.io/pypi/v/kataloger.svg?style=flat&label=Latest&color=%234B78E6&logo=&logoColor=white)](https://pypi.python.org/pypi/kataloger)
+[![Downloads](https://static.pepy.tech/badge/kataloger/month)](https://pepy.tech/project/kataloger)
+[![Tests](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml)
+[![Python version](https://img.shields.io/badge/python-3.11-blue.svg)](https://pypi.python.org/pypi/kataloger)
 
 Cataloger can help update your project dependencies with ease! All you need is point to `libs.versions.toml` file and supply it with repositories that you use in project.
 
@@ -27,10 +28,10 @@ kataloger
 #### CLI options
 
 `-p [path]` or `--path [path]` — specifies path to gradle version catalog file. You can pass more than one version catalog path. If no path provided kataloger try to find version catalogs (files with extension `.versions.toml`) in current working directory.  
-`-rp [path]` or `--repositories-path [path]` — specifies path to .toml file with repositories credentials where updates will be looked for. If no path provided kataloger try to find default repositories file with name `default.repositories.toml` in current working directory.  
+`-rp [path]` or `--repositories-path [path]` — specifies path to .toml file with repositories credentials where updates will be looked for. If no path provided kataloger try to find default repositories file with name `default.repositories.toml` in current working directory. If repositories can't be found in current directory kataloger use predefined set of repositories (Maven Central, Google and Gradle Plugin Portal).  
 `-v` or `--verbose` — if specified print more info to console.  
 `-u` or `--suggest-unstable` — if specified suggest artifact update from stable version to unstable.  
-`-f` or `--fail-on-updates` — if specified return non-zero exit code when at least one update found. Can be useful on CI.  
+`-f` or `--fail-on-updates` — if specified return non-zero exit code when at least one update found. Can be useful on CI.
 
 #### Integrate cataloger to your python script
 Cataloger has convenient API (I did my best), so you can install it from pip and use in any script.
