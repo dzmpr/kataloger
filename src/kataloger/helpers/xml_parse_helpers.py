@@ -14,11 +14,15 @@ def try_parse_maven_group_metadata(response: str) -> Optional[ArtifactMetadata]:
 
     try:
         version_info = metadata["metadata"]["versioning"]
+        versions = version_info["versions"]["version"]
+        if not isinstance(versions, list):
+            versions = [versions]
+
         return ArtifactMetadata(
-            latest_version=version_info["latest"],
-            release_version=version_info["release"],
-            versions=version_info["versions"]["version"],
-            last_updated=int(version_info["lastUpdated"]),
+            latest_version=version_info.get("latest", versions[-1]),
+            release_version=version_info.get("release", versions[-1]),
+            versions=versions,
+            last_updated=int(version_info.get("lastUpdated", 0)),
         )
     except KeyError:
         return None
