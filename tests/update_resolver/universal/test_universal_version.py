@@ -58,7 +58,7 @@ class TestUniversalVersion:
             "1.2.3-beta.4": 4,
         }
         for (version, expected_pre_release_number) in versions_to_numbers.items():
-            assert expected_pre_release_number == UniversalVersion(version).pre_release_number
+            assert UniversalVersion(version).pre_release_number == expected_pre_release_number
 
     def test_pre_release_number_should_be_extracted_as_0_from_version_if_pre_release_part_not_contains_number(self):
         versions = [
@@ -67,7 +67,7 @@ class TestUniversalVersion:
         ]
         expected_pre_release_number = 0
         for version in versions:
-            assert expected_pre_release_number == UniversalVersion(version).pre_release_number
+            assert UniversalVersion(version).pre_release_number == expected_pre_release_number
 
     def test_pre_release_index_should_be_calculated_correctly_and_case_independent(self):
         versions_to_index = {
@@ -80,7 +80,7 @@ class TestUniversalVersion:
             "1.2.3-RC01": 3,
         }
         for (version, expected_index) in versions_to_index.items():
-            assert expected_index == UniversalVersion(version)._pre_release_index()
+            assert UniversalVersion(version)._pre_release_index() == expected_index
 
     def test_versions_should_considered_as_equal_when_version_string_representations_are_equals(self):
         first_version = UniversalVersion("1.2.3-pre-release-name-005")
@@ -152,4 +152,4 @@ class TestUniversalVersion:
     def _version_comparison_test(data: list[tuple[str, str, bool]]):
         for (first_version, second_version, expected_result) in data:
             actual_result = UniversalVersion(first_version) < UniversalVersion(second_version)
-            assert expected_result == actual_result
+            assert actual_result == expected_result

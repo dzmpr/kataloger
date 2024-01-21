@@ -8,7 +8,7 @@ from kataloger.data.artifact_metadata import ArtifactMetadata
 
 def try_parse_maven_group_metadata(response: str) -> Optional[ArtifactMetadata]:
     try:
-        metadata = xmltodict.parse(response)
+        metadata = xmltodict.parse(response.strip())
     except ExpatError:
         return None
 
@@ -24,5 +24,5 @@ def try_parse_maven_group_metadata(response: str) -> Optional[ArtifactMetadata]:
             versions=versions,
             last_updated=int(version_info.get("lastUpdated", 0)),
         )
-    except KeyError:
+    except (KeyError, TypeError):
         return None

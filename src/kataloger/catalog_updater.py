@@ -23,7 +23,7 @@ class CatalogUpdater:
         update_resolvers: list[UpdateResolver],
         verbose: bool = False,
     ):
-        if not library_repositories or not plugin_repositories:
+        if not (library_repositories or plugin_repositories):
             raise KatalogerConfigurationException("No repositories provided!")
 
         if not update_resolvers:
@@ -50,7 +50,11 @@ class CatalogUpdater:
         library_updates, plugin_updates = await self.get_updates(libraries, plugins)
         return library_updates + plugin_updates
 
-    async def get_updates(self, libraries: list[Library], plugins: list[Plugin]) -> tuple[list[ArtifactUpdate], list[ArtifactUpdate]]:
+    async def get_updates(
+        self,
+        libraries: list[Library],
+        plugins: list[Plugin],
+    ) -> tuple[list[ArtifactUpdate], list[ArtifactUpdate]]:
         library_updates = await self.get_library_updates(libraries)
         plugin_updates = await self.get_plugin_updates(plugins)
         return library_updates, plugin_updates

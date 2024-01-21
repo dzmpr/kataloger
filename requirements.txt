@@ -5,6 +5,7 @@ attrs==23.2.0
 charset-normalizer==3.3.2
 frozenlist==1.4.1
 pytest==7.4.4
+pytest-asyncio==0.23.3
 idna==3.6
 multidict==6.0.4
 xmltodict==0.13.0

@@ -10,11 +10,12 @@ from kataloger.update_resolver.base.update_resolver import UpdateResolver
 
 class CatalogUpdaterBuilder:
 
-    repositories_path: Optional[Path] = None
-    library_repositories: list[Repository] = []
-    plugin_repositories: list[Repository] = []
-    update_resolvers: list[UpdateResolver] = []
-    verbose: bool = False
+    def __init__(self):
+        self.repositories_path: Optional[Path] = None
+        self.library_repositories: list[Repository] = []
+        self.plugin_repositories: list[Repository] = []
+        self.update_resolvers: list[UpdateResolver] = []
+        self.verbose: bool = False
 
     def set_repositories_path(self, path: Path) -> Self:
         if not (path.exists() and path.is_file()):
@@ -50,8 +51,8 @@ class CatalogUpdaterBuilder:
             self.plugin_repositories.extend(plugin_repos)
 
         return CatalogUpdater(
-            self.library_repositories,
-            self.plugin_repositories,
-            self.update_resolvers,
-            self.verbose,
+            library_repositories=self.library_repositories,
+            plugin_repositories=self.plugin_repositories,
+            update_resolvers=self.update_resolvers,
+            verbose=self.verbose,
         )
