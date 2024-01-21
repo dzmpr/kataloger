@@ -1,27 +1,37 @@
 ## Kataloger
 
-
 [![Latest version](https://img.shields.io/pypi/v/kataloger.svg?style=flat&label=Latest&color=%234B78E6&logo=&logoColor=white)](https://pypi.python.org/pypi/kataloger)
 [![Downloads](https://static.pepy.tech/badge/kataloger/month)](https://pepy.tech/project/kataloger)
 [![Tests](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml)
 [![Python version](https://img.shields.io/badge/python-3.11-blue.svg)](https://pypi.python.org/pypi/kataloger)
 
-Cataloger can help update your project dependencies with ease! All you need is point to `libs.versions.toml` file and supply it with repositories that you use in project.
+Kataloger can help update your project dependencies with ease! All you need is point to `libs.versions.toml` file and supply it with repositories that you use in project.
+
+### Features
+- Better than Android Studio built-in tool :)
+- Gradle-free
+- Can be used on CI
+- Flexible and open-source
 
 ### How to use?
-#### CLI mode
-Cataloger offers handy CLI mode which you can use locally or on CI:
+Kataloger offers handy CLI which you can use locally or on CI.
+
+You can pass path to version catalog using `-p` parameter and path to repositories that should be used to search for with `-rp` parameter:
+```commandline
+kataloger -p ~/ProjectDir/libs.versions.toml -rp ~/ProjectDir/default.repositories.toml
+```
+Repositories should be specified in separate `.toml` file separately for libraries and plugins. You can use [default](./src/kataloger/default.repositories.toml) repositories file as template.
+
+If repositories not provided kataloger use [default](./src/kataloger/default.repositories.toml) set of repositories (Maven Central, Google Maven and Gradle Plugin Portal):
 
 ```commandline
-pip install kataloger
-kataloger -p /ProjectDir/libs.versions.toml -rp /ProjectDir/default.repositories.toml
+kataloger -p ~/ProjectDir/libs.versions.toml
 ```
 
-Or you can omit paths to version catalog and repositories if they are located in current working directory:
+Or you can omit paths to version catalog and repositories if they are located in current working directory. In this mode kataloger trying to find all catalogs (files with `.versions.toml` extension) and repositories in `default.repositories.toml` file in current directory:
 
 ```commandline
-pip install kataloger
-cd /ProjectDir
+cd ~/ProjectDir
 kataloger
 ```
 
@@ -33,12 +43,30 @@ kataloger
 `-u` or `--suggest-unstable` — if specified suggest artifact update from stable version to unstable.  
 `-f` or `--fail-on-updates` — if specified return non-zero exit code when at least one update found. Can be useful on CI.
 
-#### Integrate cataloger to your python script
-Cataloger has convenient API (I did my best), so you can install it from pip and use in any script.
+### Installation
 
-### Roadmap
+Kataloger available in Python Package Index (PyPI). You can install kataloger using pip:
+```commandline
+pip install kataloger
+```
 
-- [x] Support check multiple catalogs
-- [ ] Support all notations in version catalog
-- [ ] Support advanced update configuration
-- [ ] Support Python <3.11
+### Use kataloger in python scripts
+Kataloger has convenient API (I did my best), so you can write custom logic on top. More info about it can be found [here](./src/kataloger/update_resolver).
+
+### License
+
+```text
+Copyright 2023 Dzmitry Pryskoka
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
