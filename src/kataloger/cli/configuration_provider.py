@@ -6,7 +6,7 @@ from typing import Optional
 
 from kataloger import package_name
 from kataloger.data.kataloger_configuration import KatalogerConfiguration
-from kataloger.execptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
 
 
 def parse_configuration() -> KatalogerConfiguration:

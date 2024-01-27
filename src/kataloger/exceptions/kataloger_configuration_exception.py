@@ -1,4 +1,4 @@
-from kataloger.execptions.kataloger_exception import KatalogerException
+from kataloger.exceptions.kataloger_exception import KatalogerException
 
 
 class KatalogerConfigurationException(KatalogerException):

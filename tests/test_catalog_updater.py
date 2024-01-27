@@ -8,7 +8,7 @@ from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.artifact_update import ArtifactUpdate
 from kataloger.data.repository import Repository
-from kataloger.execptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
 from kataloger.update_resolver.base.update_resolution import UpdateResolution
 from kataloger.update_resolver.base.update_resolver import UpdateResolver
 

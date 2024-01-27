@@ -7,7 +7,7 @@ from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.artifact_update import ArtifactUpdate
 from kataloger.data.metadata_repository_info import MetadataRepositoryInfo
 from kataloger.data.repository import Repository
-from kataloger.execptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
 from kataloger.helpers.log_helpers import log_warning
 from kataloger.helpers.toml_parse_helpers import load_catalog
 from kataloger.helpers.update_helpers import get_all_artifact_metadata

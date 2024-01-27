@@ -7,7 +7,7 @@ from kataloger import catalog_updater_builder
 from kataloger.catalog_updater import CatalogUpdater
 from kataloger.catalog_updater_builder import CatalogUpdaterBuilder
 from kataloger.data.repository import Repository
-from kataloger.execptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
 
 
 class TestCatalogUpdaterBuilder:

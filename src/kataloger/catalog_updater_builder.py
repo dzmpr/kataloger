@@ -3,7 +3,7 @@ from typing import Optional, Self
 
 from kataloger.catalog_updater import CatalogUpdater
 from kataloger.data.repository import Repository
-from kataloger.execptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
 from kataloger.helpers.toml_parse_helpers import load_repositories
 from kataloger.update_resolver.base.update_resolver import UpdateResolver
 

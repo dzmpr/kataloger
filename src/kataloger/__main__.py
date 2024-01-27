@@ -3,7 +3,7 @@ import sys
 import asyncio
 
 from kataloger.cli import cli
-from kataloger.execptions.kataloger_exception import KatalogerException
+from kataloger.exceptions.kataloger_exception import KatalogerException
 
 
 def main() -> int:

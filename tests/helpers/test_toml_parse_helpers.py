@@ -6,7 +6,7 @@ from yarl import URL
 from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.repository import Repository
-from kataloger.execptions.kataloger_parse_exception import KatalogerParseException
+from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
 from kataloger.helpers import toml_parse_helpers
 from kataloger.helpers.toml_parse_helpers import parse_plugins, parse_libraries, parse_repositories, \
     load_toml_to_dict, load_repositories, load_catalog

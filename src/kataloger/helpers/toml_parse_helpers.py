@@ -6,7 +6,7 @@ from yarl import URL
 from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.repository import Repository
-from kataloger.execptions.kataloger_parse_exception import KatalogerParseException
+from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
 from kataloger.helpers.log_helpers import log_warning
 
 

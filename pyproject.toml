@@ -29,6 +29,7 @@ classifiers = [
 ]
 
 [tool.setuptools.packages.find]
+namespaces = false
 where = ["src"]
 
 [tool.setuptools.package-data]
