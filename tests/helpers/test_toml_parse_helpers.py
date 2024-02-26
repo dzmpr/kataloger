@@ -57,6 +57,61 @@ class TestTomlParseHelpers:
 
         assert actual_plugins == expected_plugins
 
+    def test_should_parse_plugin_when_it_has_declaration(self):
+        catalog: dict = {
+            "plugins": {
+                self.default_artifact_name: f"{self.default_plugin_id}:{self.default_version}"
+            },
+        }
+        expected_plugin: Plugin = Plugin(
+            name=self.default_artifact_name,
+            coordinates=self.default_plugin_id,
+            version=self.default_version,
+        )
+        actual_plugins: list[Plugin] = parse_plugins(catalog, versions={}, verbose=False)
+
+        assert actual_plugins == [expected_plugin]
+
+    def test_should_raise_exception_when_plugin_declaration_has_no_version(self):
+        catalog: dict = {
+            "plugins": {
+                self.default_artifact_name: f"{self.default_plugin_id}:"
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_plugins(catalog, versions={}, verbose=False)
+
+    def test_should_raise_exception_when_plugin_declaration_has_no_coordinates(self):
+        catalog: dict = {
+            "plugins": {
+                self.default_artifact_name: f":{self.default_version}"
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_plugins(catalog, versions={}, verbose=False)
+
+    def test_should_raise_exception_when_plugin_declaration_has_no_colon_delimiter(self):
+        catalog: dict = {
+            "plugins": {
+                self.default_artifact_name: "com.plugin.module.1.0.0"
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_plugins(catalog, versions={}, verbose=False)
+
+    def test_should_raise_exception_when_plugin_declaration_is_empty(self):
+        catalog: dict = {
+            "plugins": {
+                self.default_artifact_name: ""
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_plugins(catalog, versions={}, verbose=False)
+
     def test_should_parse_plugin_when_it_has_id_and_version(self):
         catalog: dict = {
             "plugins": {
@@ -128,6 +183,121 @@ class TestTomlParseHelpers:
 
         assert actual_libraries == expected_libraries
 
+    def test_should_parse_library_when_it_has_declaration(self):
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: f"{self.default_library_module}:{self.default_version}"
+            },
+        }
+        expected_library: Library = Library(
+            name=self.default_artifact_name,
+            coordinates=self.default_library_module,
+            version=self.default_version,
+        )
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
+
+        assert actual_libraries == [expected_library]
+
+    def test_should_raise_exception_when_library_declaration_has_no_version(self):
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: f"{self.default_library_module}:"
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_libraries(catalog, versions={}, verbose=False)
+
+    def test_should_raise_exception_when_library_declaration_has_no_coordinates(self):
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: f":{self.default_version}"
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_libraries(catalog, versions={}, verbose=False)
+
+    def test_should_raise_exception_when_library_declaration_has_no_colon_delimiter(self):
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: "com.library.module.1.0.0"
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_libraries(catalog, versions={}, verbose=False)
+
+    def test_should_raise_exception_when_library_declaration_is_empty(self):
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: ""
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_libraries(catalog, versions={}, verbose=False)
+
+    def test_should_parse_library_when_it_has_group_name_and_version(self):
+        library_group: str = "com.library.group"
+        library_name: str = "library-name"
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: {
+                    "group": library_group,
+                    "name": library_name,
+                    "version": self.default_version,
+                }
+            },
+        }
+        expected_library: Library = Library(
+            name=self.default_artifact_name,
+            coordinates=f"{library_group}:{library_name}",
+            version=self.default_version,
+        )
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
+
+        assert actual_libraries == [expected_library]
+
+    def test_should_parse_library_when_it_has_group_name_and_version_reference(self):
+        library_group: str = "com.library.group"
+        library_name: str = "library-name"
+        version_reference: str = f"{self.default_artifact_name}.version"
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: {
+                    "group": library_group,
+                    "name": library_name,
+                    "version": {"ref": version_reference},
+                }
+            },
+        }
+        versions: dict[str, str] = {version_reference: self.default_version}
+        expected_library: Library = Library(
+            name=self.default_artifact_name,
+            coordinates=f"{library_group}:{library_name}",
+            version=self.default_version,
+        )
+        actual_libraries: list[Library] = parse_libraries(catalog, versions, verbose=False)
+
+        assert actual_libraries == [expected_library]
+
+    def test_should_raise_exception_when_there_is_library_group_and_name_but_no_version_by_reference(self):
+        library_group: str = "com.library.group"
+        library_name: str = "library-name"
+        catalog: dict = {
+            "libraries": {
+                self.default_artifact_name: {
+                    "group": library_group,
+                    "name": library_name,
+                    "version": {"ref": "version_reference"},
+                }
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_libraries(catalog, versions={}, verbose=False)
+
     def test_should_parse_library_when_it_has_module_and_version(self):
         catalog: dict = {
             "libraries": {
@@ -166,7 +336,7 @@ class TestTomlParseHelpers:
 
         assert actual_libraries == [expected_library]
 
-    def test_should_raise_exception_when_there_is_no_library_version_by_reference(self):
+    def test_should_raise_exception_when_there_is_library_module_but_no_version_by_reference(self):
         catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {

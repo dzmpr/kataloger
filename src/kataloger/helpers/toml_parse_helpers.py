@@ -1,5 +1,6 @@
 import tomllib
 from pathlib import Path
+from typing import Tuple
 
 from yarl import URL
 
@@ -59,6 +60,28 @@ def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: boo
 
     for name, library in catalog["libraries"].items():
         match library:
+            case str(declaration):
+                (module, version) = __parse_declaration(declaration)
+                library = Library(
+                    name=name,
+                    coordinates=module,
+                    version=version,
+                )
+                libraries.append(library)
+            case {"group": str(group), "name": str(library_name), "version": str(version)}:
+                library = Library(
+                    name=name,
+                    coordinates=f"{group}:{library_name}",
+                    version=version,
+                )
+                libraries.append(library)
+            case {"group": str(group), "name": str(library_name), "version": {"ref": str(ref)}}:
+                library = Library(
+                    name=name,
+                    coordinates=f"{group}:{library_name}",
+                    version=__get_version_by_reference(versions, ref, name),
+                )
+                libraries.append(library)
             case {"module": str(module), "version": str(version)}:
                 library = Library(
                     name=name,
@@ -67,13 +90,10 @@ def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: boo
                 )
                 libraries.append(library)
             case {"module": str(module), "version": {"ref": str(ref)}}:
-                if not (version := versions.get(ref)):
-                    raise KatalogerParseException(f"Version for \"{name}\" not specified by reference \"{ref}\".")
-
                 library = Library(
                     name=name,
                     coordinates=module,
-                    version=version,
+                    version=__get_version_by_reference(versions, ref, name),
                 )
                 libraries.append(library)
             case {"module": str(module)}:
@@ -92,6 +112,14 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
 
     for name, plugin in catalog["plugins"].items():
         match plugin:
+            case str(declaration):
+                (plugin_id, version) = __parse_declaration(declaration)
+                plugin = Plugin(
+                    name=name,
+                    coordinates=plugin_id,
+                    version=version,
+                )
+                plugins.append(plugin)
             case {"id": str(plugin_id), "version": str(version)}:
                 plugin = Plugin(
                     name=name,
@@ -100,13 +128,10 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
                 )
                 plugins.append(plugin)
             case {"id": str(plugin_id), "version": {"ref": str(ref)}}:
-                if not (version := versions.get(ref)):
-                    raise KatalogerParseException(f"There is no version for \"{name}\" by key \"{ref}\".")
-
                 plugin = Plugin(
                     name=name,
                     coordinates=plugin_id,
-                    version=version,
+                    version=__get_version_by_reference(versions, ref, name),
                 )
                 plugins.append(plugin)
             case {"id": str(plugin_id)}:
@@ -116,6 +141,24 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
                 raise KatalogerParseException(f"Unknown plugin notation: {plugin}")
 
     return plugins
+
+
+def __parse_declaration(declaration: str) -> Tuple[str, str]:
+    components = declaration.rsplit(':', 1)
+    if len(components) != 2 or not (components[0].strip() and components[1].strip()):
+        raise KatalogerParseException(f"Unknown declaration format: \"{declaration}\".")
+    return components[0], components[1]
+
+
+def __get_version_by_reference(
+    versions: dict,
+    version_ref: str,
+    artifact_name: str,
+) -> str:
+    if not (version := versions.get(version_ref)):
+        raise KatalogerParseException(f"Version for \"{artifact_name}\" not specified by reference \"{version_ref}\".")
+
+    return version
 
 
 def load_toml_to_dict(path: Path) -> dict[str, str | dict]:
