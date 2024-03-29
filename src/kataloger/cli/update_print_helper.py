@@ -6,7 +6,7 @@ def print_catalog_updates(
     catalog_name: str,
     catalog_count: int,
     verbose: bool,
-):
+) -> None:
     if catalog_name.endswith(".versions.toml"):
         catalog_name = catalog_name.removesuffix(".versions.toml")
     else:

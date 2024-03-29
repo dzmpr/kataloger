@@ -24,10 +24,12 @@ class CatalogUpdater:
         verbose: bool = False,
     ):
         if not (library_repositories or plugin_repositories):
-            raise KatalogerConfigurationException("No repositories provided!")
+            message = "No repositories provided!"
+            raise KatalogerConfigurationException(message)
 
         if not update_resolvers:
-            raise KatalogerConfigurationException("No update resolvers provided!")
+            message = "No update resolvers provided!"
+            raise KatalogerConfigurationException(message)
 
         self.library_repositories = library_repositories
         self.plugin_repositories = plugin_repositories
@@ -99,8 +101,11 @@ class CatalogUpdater:
         for resolver in self.update_resolvers:
             (resolution, optional_update) = resolver.resolve(artifact, repositories_metadata)
             match resolution:
-                case UpdateResolution.CANT_RESOLVE: continue
-                case UpdateResolution.UPDATE_FOUND: return optional_update
-                case UpdateResolution.NO_UPDATES: return None
+                case UpdateResolution.CANT_RESOLVE:
+                    continue
+                case UpdateResolution.UPDATE_FOUND:
+                    return optional_update
+                case UpdateResolution.NO_UPDATES:
+                    return None
 
         return None

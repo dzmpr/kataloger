@@ -1,6 +1,5 @@
-import sys
-
 import asyncio
+import sys
 
 from kataloger.cli import cli
 from kataloger.exceptions.kataloger_exception import KatalogerException

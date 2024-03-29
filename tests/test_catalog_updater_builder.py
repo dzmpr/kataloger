@@ -33,9 +33,11 @@ class TestCatalogUpdaterBuilder:
         plugin_repository: Repository = EntityFactory.create_repository()
         load_repositories_mock: Mock = Mock(return_value=([library_repository], [plugin_repository]))
 
-        with patch.object(CatalogUpdater, "__init__", Mock(return_value=None)) as init_mock:
-            with patch.object(catalog_updater_builder, "load_repositories", load_repositories_mock):
-                CatalogUpdaterBuilder().set_repositories_path(Mock()).build()
+        with (
+            patch.object(CatalogUpdater, "__init__", Mock(return_value=None)) as init_mock,
+            patch.object(catalog_updater_builder, "load_repositories", load_repositories_mock),
+        ):
+            CatalogUpdaterBuilder().set_repositories_path(Mock()).build()
 
         init_mock.assert_called_once_with(
             library_repositories=[library_repository],

@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from importlib.metadata import version
-from importlib.resources import files, as_file
+from importlib.resources import as_file, files
 from pathlib import Path
 from typing import Optional
 
@@ -14,7 +14,7 @@ def parse_configuration() -> KatalogerConfiguration:
         prog="kataloger",
         description="A Python command-line utility to discover updates for your gradle version catalogs.",
         allow_abbrev=False,
-        epilog="Visit project repository to get more information."
+        epilog="Visit project repository to get more information.",
     )
     parser.add_argument(
         "-p", "--path",
@@ -68,20 +68,20 @@ def parse_configuration() -> KatalogerConfiguration:
 def _get_kataloger_version() -> str:
     if __name__ == '__main__':
         return "indev"
-    else:
-        return version(package_name)
+    return version(package_name)
 
 
 def _get_catalog_paths(path_strings: list[str]) -> list[Path]:
     if path_strings:
-        return list(map(lambda path: _str_to_path(path), path_strings))
+        return [_str_to_path(path) for path in path_strings]
 
     # If catalog path not provided try to find catalogs in cwd.
     catalog_files = Path.cwd().glob("*.versions.toml")
     catalog_paths = list(filter(lambda path: path.exists() and path.is_file(), catalog_files))
     if not catalog_paths:
-        raise KatalogerConfigurationException("Gradle version catalog not found in current directory. Please specify "
-                                              "path to catalog via parameter or run tool from directory with catalog.")
+        message = "Gradle version catalog not found in current directory. Please specify " \
+                   "path to catalog via parameter or run tool from directory with catalog."
+        raise KatalogerConfigurationException(message)
 
     return catalog_paths
 
@@ -95,8 +95,7 @@ def _get_repositories_path(path_string: Optional[str]) -> Path:
         return repositories_candidate
 
     with as_file(files(package_name).joinpath("default.repositories.toml")) as path:
-        bundled_repositories_path = path
-    return bundled_repositories_path
+        return path
 
 
 def _str_to_path(path_string: str) -> Path:

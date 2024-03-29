@@ -129,7 +129,7 @@ class TestXmlParseHelpers:
         assert actual_metadata is None
 
     def test_should_return_none_when_metadata_has_empty_versioning_tag(self):
-        response: str = f"""\
+        response: str = """\
             <?xml version="1.0" encoding="UTF-8"?>
             <metadata>
             <groupId>com.library</groupId>
@@ -142,7 +142,7 @@ class TestXmlParseHelpers:
         assert actual_metadata is None
 
     def test_should_return_none_when_metadata_has_no_versioning_tag(self):
-        response: str = f"""\
+        response: str = """\
             <?xml version="1.0" encoding="UTF-8"?>
             <metadata>
             <groupId>com.library</groupId>
@@ -154,7 +154,7 @@ class TestXmlParseHelpers:
         assert actual_metadata is None
 
     def test_should_return_none_when_response_has_not_metadata_xml(self):
-        response: str = f"""\
+        response: str = """\
             <?xml version="1.0" encoding="UTF-8"?>
             <note>
             <script/>
@@ -190,20 +190,9 @@ class TestXmlParseHelpers:
         versions: list[str],
         last_updated: Optional[int],
     ) -> str:
-        if latest_version:
-            latest_version_element = f"<latest>{latest_version}</latest>"
-        else:
-            latest_version_element = ""
-
-        if release_version:
-            release_version_element = f"<release>{release_version}</release>"
-        else:
-            release_version_element = ""
-
-        if last_updated:
-            last_updated_tag = f"<lastUpdated>{last_updated}</lastUpdated>"
-        else:
-            last_updated_tag = ""
+        latest_version_element = f"<latest>{latest_version}</latest>" if latest_version else ""
+        release_version_element = f"<release>{release_version}</release>" if release_version else ""
+        last_updated_tag = f"<lastUpdated>{last_updated}</lastUpdated>" if last_updated else ""
 
         versions_array = "".join(f"<version>{version}</version>" for version in versions)
         return f"""

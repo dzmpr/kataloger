@@ -1,4 +1,5 @@
-from unittest.mock import Mock, patch, mock_open
+from pathlib import Path
+from unittest.mock import Mock, mock_open, patch
 
 import pytest
 from yarl import URL
@@ -8,8 +9,14 @@ from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.repository import Repository
 from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
 from kataloger.helpers import toml_parse_helpers
-from kataloger.helpers.toml_parse_helpers import parse_plugins, parse_libraries, parse_repositories, \
-    load_toml_to_dict, load_repositories, load_catalog
+from kataloger.helpers.toml_parse_helpers import (
+    load_catalog,
+    load_repositories,
+    load_toml_to_dict,
+    parse_libraries,
+    parse_plugins,
+    parse_repositories,
+)
 
 
 class TestTomlParseHelpers:
@@ -24,31 +31,30 @@ class TestTomlParseHelpers:
         toml: bytes = b"""\
         [versions]
         hilt = "2.50"
-        
+
         [libraries]
         kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version = "1.9.22" }
         """
         expected_data: dict = {
             "versions": {
-                "hilt": "2.50"
+                "hilt": "2.50",
             },
             "libraries": {
                 "kotlin-stdlib": {
                     "module": "org.jetbrains.kotlin:kotlin-stdlib",
                     "version": "1.9.22",
-                }
+                },
             },
         }
-        with patch("builtins.open", mock_open(read_data=toml)):
+        with patch.object(Path, "open", mock_open(read_data=toml)):
             actual_data: dict = load_toml_to_dict(path=Mock())
 
         assert actual_data == expected_data
 
     def test_should_raise_exception_when_toml_format_is_incorrect(self):
         toml: bytes = b"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>"""
-        with patch("builtins.open", mock_open(read_data=toml)):
-            with pytest.raises(KatalogerParseException):
-                load_toml_to_dict(path=Mock())
+        with patch.object(Path, "open", mock_open(read_data=toml)), pytest.raises(KatalogerParseException):
+            load_toml_to_dict(path=Mock())
 
     def test_should_return_empty_plugins_list_when_catalog_has_no_plugins(self):
         catalog: dict = {"libraries": {}}
@@ -60,7 +66,7 @@ class TestTomlParseHelpers:
     def test_should_parse_plugin_when_it_has_declaration(self):
         catalog: dict = {
             "plugins": {
-                self.default_artifact_name: f"{self.default_plugin_id}:{self.default_version}"
+                self.default_artifact_name: f"{self.default_plugin_id}:{self.default_version}",
             },
         }
         expected_plugin: Plugin = Plugin(
@@ -75,7 +81,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_plugin_declaration_has_no_version(self):
         catalog: dict = {
             "plugins": {
-                self.default_artifact_name: f"{self.default_plugin_id}:"
+                self.default_artifact_name: f"{self.default_plugin_id}:",
             },
         }
 
@@ -85,7 +91,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_plugin_declaration_has_no_coordinates(self):
         catalog: dict = {
             "plugins": {
-                self.default_artifact_name: f":{self.default_version}"
+                self.default_artifact_name: f":{self.default_version}",
             },
         }
 
@@ -95,7 +101,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_plugin_declaration_has_no_colon_delimiter(self):
         catalog: dict = {
             "plugins": {
-                self.default_artifact_name: "com.plugin.module.1.0.0"
+                self.default_artifact_name: "com.plugin.module.1.0.0",
             },
         }
 
@@ -105,7 +111,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_plugin_declaration_is_empty(self):
         catalog: dict = {
             "plugins": {
-                self.default_artifact_name: ""
+                self.default_artifact_name: "",
             },
         }
 
@@ -118,7 +124,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "id": self.default_plugin_id,
                     "version": self.default_version,
-                }
+                },
             },
         }
         expected_plugin: Plugin = Plugin(
@@ -137,7 +143,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "id": self.default_plugin_id,
                     "version": {"ref": version_reference},
-                }
+                },
             },
         }
         versions: dict[str, str] = {version_reference: self.default_version}
@@ -156,7 +162,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "id": self.default_plugin_id,
                     "version": {"ref": "version_reference"},
-                }
+                },
             },
         }
 
@@ -169,7 +175,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "module": self.default_plugin_id,
                     "ref": "version",
-                }
+                },
             },
         }
 
@@ -186,7 +192,7 @@ class TestTomlParseHelpers:
     def test_should_parse_library_when_it_has_declaration(self):
         catalog: dict = {
             "libraries": {
-                self.default_artifact_name: f"{self.default_library_module}:{self.default_version}"
+                self.default_artifact_name: f"{self.default_library_module}:{self.default_version}",
             },
         }
         expected_library: Library = Library(
@@ -201,7 +207,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_library_declaration_has_no_version(self):
         catalog: dict = {
             "libraries": {
-                self.default_artifact_name: f"{self.default_library_module}:"
+                self.default_artifact_name: f"{self.default_library_module}:",
             },
         }
 
@@ -211,7 +217,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_library_declaration_has_no_coordinates(self):
         catalog: dict = {
             "libraries": {
-                self.default_artifact_name: f":{self.default_version}"
+                self.default_artifact_name: f":{self.default_version}",
             },
         }
 
@@ -221,7 +227,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_library_declaration_has_no_colon_delimiter(self):
         catalog: dict = {
             "libraries": {
-                self.default_artifact_name: "com.library.module.1.0.0"
+                self.default_artifact_name: "com.library.module.1.0.0",
             },
         }
 
@@ -231,7 +237,7 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_library_declaration_is_empty(self):
         catalog: dict = {
             "libraries": {
-                self.default_artifact_name: ""
+                self.default_artifact_name: "",
             },
         }
 
@@ -247,7 +253,7 @@ class TestTomlParseHelpers:
                     "group": library_group,
                     "name": library_name,
                     "version": self.default_version,
-                }
+                },
             },
         }
         expected_library: Library = Library(
@@ -269,7 +275,7 @@ class TestTomlParseHelpers:
                     "group": library_group,
                     "name": library_name,
                     "version": {"ref": version_reference},
-                }
+                },
             },
         }
         versions: dict[str, str] = {version_reference: self.default_version}
@@ -291,7 +297,7 @@ class TestTomlParseHelpers:
                     "group": library_group,
                     "name": library_name,
                     "version": {"ref": "version_reference"},
-                }
+                },
             },
         }
 
@@ -304,7 +310,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "module": self.default_library_module,
                     "version": self.default_version,
-                }
+                },
             },
         }
         expected_library: Library = Library(
@@ -323,7 +329,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "module": self.default_library_module,
                     "version": {"ref": version_reference},
-                }
+                },
             },
         }
         versions: dict[str, str] = {version_reference: self.default_version}
@@ -342,7 +348,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "module": self.default_library_module,
                     "version": {"ref": "version_reference"},
-                }
+                },
             },
         }
 
@@ -355,7 +361,7 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "id": self.default_library_module,
                     "ref": "version",
-                }
+                },
             },
         }
 
@@ -392,7 +398,7 @@ class TestTomlParseHelpers:
                     "user": repository_user,
                     "password": repository_password,
                 },
-            )
+            ),
         ]
         expected_repository: Repository = Repository(
             name=self.default_repository_name,
@@ -411,7 +417,7 @@ class TestTomlParseHelpers:
                     "address": self.default_repository_address,
                     "user": "username",
                 },
-            )
+            ),
         ]
 
         with pytest.raises(KatalogerParseException):
@@ -424,7 +430,7 @@ class TestTomlParseHelpers:
                     "address": self.default_repository_address,
                     "password": "password",
                 },
-            )
+            ),
         ]
 
         with pytest.raises(KatalogerParseException):
@@ -445,13 +451,13 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "module": self.default_library_module,
                     "version": {"ref": version_reference},
-                }
+                },
             },
             "plugins": {
                 self.default_artifact_name: {
                     "id": self.default_plugin_id,
                     "version": self.default_version,
-                }
+                },
             },
         }
         expected_library: Library = Library(
@@ -484,7 +490,7 @@ class TestTomlParseHelpers:
                     "user": repository_user,
                     "password": repository_password,
                 },
-            }
+            },
         }
         expected_library_repository: Repository = Repository(
             name=self.default_repository_name,

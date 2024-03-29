@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
-from kataloger.update_resolver.universal.version import (Version)
+from kataloger.update_resolver.universal.version import Version
 
 T = TypeVar("T", bound=Version)
 

@@ -44,3 +44,37 @@ kataloger = "kataloger.__main__:main"
 
 [tool.pytest.ini_options]
 pythonpath = "src/"
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py38"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "ANN", # flake8-annotations
+    "COM", # flake8-commas
+    "C4",  # flake8-comprehensions
+    "EM",  # flake8-errmsg
+    "UP",  # pyupgrade
+    "PYI", # flake8-pyi
+    "PT", # flake8-pytest-style
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "ARG", # flake8-unused-arguments
+    "PTH", # flake8-use-pathlib
+]
+ignore = [
+    "ANN101", # will be deprecated
+    "ANN102", # will be deprecated
+    "ANN204", # return type annotation for special methods
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/test_*.py" = ["ANN201", "ANN205"] # return not required for tests

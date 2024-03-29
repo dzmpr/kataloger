@@ -66,7 +66,7 @@ class UniversalUpdateResolver(UpdateResolver):
 
             if artifact_version == update_version:
                 return UpdateResolution.NO_UPDATES, None
-            elif artifact_version < update_version:
+            if artifact_version < update_version:
                 update = ArtifactUpdate(
                     name=artifact.name,
                     update_repository_name=repository_metadata.repository.name,
@@ -81,8 +81,7 @@ class UniversalUpdateResolver(UpdateResolver):
     def __most_recently_updated_repository(
         repositories_metadata: list[MetadataRepositoryInfo],
     ) -> MetadataRepositoryInfo:
-        repository = max(repositories_metadata, key=lambda rm: rm.metadata.last_updated)
-        return repository
+        return max(repositories_metadata, key=lambda rm: rm.metadata.last_updated)
 
     @staticmethod
     def __repository_with_current_version(

@@ -63,7 +63,7 @@ class TestUniversalVersion:
     def test_pre_release_number_should_be_extracted_as_0_from_version_if_pre_release_part_not_contains_number(self):
         versions = [
             "1.2.3",
-            "1.2.3-beta"
+            "1.2.3-beta",
         ]
         expected_pre_release_number = 0
         for version in versions:
@@ -122,7 +122,7 @@ class TestUniversalVersion:
         ]
         self._version_comparison_test(versions)
 
-    def test_when_numeric_parts_are_equal_pre_release_version_should_considered_less_than_not_pre_release_version(self):
+    def test_should_considered_less_than_not_pre_release_version_when_numeric_parts_are_equal_pre_release_version(self):
         versions = [
             ("1.0.0-alpha", "1.0.0", True),
             ("1.0.0-beta01", "1.0.0", True),
@@ -130,7 +130,7 @@ class TestUniversalVersion:
         ]
         self._version_comparison_test(versions)
 
-    def test_when_numeric_parts_and_pre_release_names_are_equal_should_compare_by_pre_release_numbers(self):
+    def test_should_compare_by_pre_release_numbers_when_numeric_parts_and_pre_release_names_are_equal(self):
         versions = [
             ("1.0.0-alpha01", "1.0.0-alpha02", True),
             ("1.0.0-alpha01", "1.0.0-alpha2", True),
@@ -139,7 +139,7 @@ class TestUniversalVersion:
         ]
         self._version_comparison_test(versions)
 
-    def test_when_numeric_parts_are_equal_and_pre_release_names_are_not_equals_should_compare_by_pre_release_name_index(self):
+    def test_should_compare_by_pre_release_index_when_numeric_parts_are_equal_and_pre_release_names_are_not_equal(self):
         versions = [
             ("1.0.0-alpha", "1.0.0-beta100", True),
             ("1.0.0-dev", "1.0.0-rc100", True),

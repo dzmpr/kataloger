@@ -34,5 +34,4 @@ async def run() -> int:
 
     if configuration.fail_on_updates and has_updates:
         return 1
-    else:
-        return 0
+    return 0

@@ -1,9 +1,8 @@
+import asyncio
 from collections import defaultdict
 from typing import Optional
 
-import asyncio
-from aiohttp import BasicAuth
-from aiohttp import ClientSession
+from aiohttp import BasicAuth, ClientSession
 
 from kataloger.data.artifact.artifact import Artifact
 from kataloger.data.metadata_repository_info import MetadataRepositoryInfo

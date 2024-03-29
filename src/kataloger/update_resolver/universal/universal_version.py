@@ -25,13 +25,13 @@ class UniversalVersion(Version):
     def is_pre_release(self) -> bool:
         return self.pre_release_name is not None
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, UniversalVersion):
             return False
 
         return self.raw == other.raw
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: object) -> bool:
         if not isinstance(other, UniversalVersion):
             return False
 
@@ -47,7 +47,7 @@ class UniversalVersion(Version):
         for self_digit, other_digit in zip_longest(self_digits, other_digits, fillvalue=0):
             if self_digit < other_digit:
                 return True
-            elif self_digit > other_digit:
+            if self_digit > other_digit:
                 return False
 
         # Numeric part is equal, lets compare pre-release part.
@@ -62,12 +62,14 @@ class UniversalVersion(Version):
                 other_pr_index = other._pre_release_index()
                 if self_pr_index < other_pr_index:
                     return True
-                elif self_pr_index > other_pr_index:
+                if self_pr_index > other_pr_index:
                     return False
             return False
-        elif not self.is_pre_release() and other.is_pre_release():
+
+        if not self.is_pre_release() and other.is_pre_release():
             return False
-        elif self.is_pre_release() and not other.is_pre_release():
+
+        if self.is_pre_release() and not other.is_pre_release():
             return True
 
         return False

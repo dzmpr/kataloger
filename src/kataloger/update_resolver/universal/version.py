@@ -13,9 +13,9 @@ class Version(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: object) -> bool:
         raise NotImplementedError

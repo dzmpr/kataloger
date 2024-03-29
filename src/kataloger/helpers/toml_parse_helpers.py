@@ -1,7 +1,7 @@
-import tomllib
 from pathlib import Path
 from typing import Tuple
 
+import tomllib
 from yarl import URL
 
 from kataloger.data.artifact.library import Library
@@ -100,7 +100,8 @@ def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: boo
                 if verbose:
                     log_warning(f"Library \"{module}\" has no version in catalog.")
             case _:
-                raise KatalogerParseException(f"Unknown library notation: {library}")
+                message = f"Unknown library notation: {library}"
+                raise KatalogerParseException(message)
 
     return libraries
 
@@ -138,7 +139,8 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
                 if verbose:
                     log_warning(f"Plugin \"{plugin_id}\" has no version in catalog.")
             case _:
-                raise KatalogerParseException(f"Unknown plugin notation: {plugin}")
+                message = f"Unknown plugin notation: {plugin}"
+                raise KatalogerParseException(message)
 
     return plugins
 
@@ -146,7 +148,8 @@ def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool)
 def __parse_declaration(declaration: str) -> Tuple[str, str]:
     components = declaration.rsplit(':', 1)
     if len(components) != 2 or not (components[0].strip() and components[1].strip()):
-        raise KatalogerParseException(f"Unknown declaration format: \"{declaration}\".")
+        message = f"Unknown declaration format: \"{declaration}\"."
+        raise KatalogerParseException(message)
     return components[0], components[1]
 
 
@@ -156,14 +159,16 @@ def __get_version_by_reference(
     artifact_name: str,
 ) -> str:
     if not (version := versions.get(version_ref)):
-        raise KatalogerParseException(f"Version for \"{artifact_name}\" not specified by reference \"{version_ref}\".")
+        message = f"Version for \"{artifact_name}\" not specified by reference \"{version_ref}\"."
+        raise KatalogerParseException(message)
 
     return version
 
 
 def load_toml_to_dict(path: Path) -> dict[str, str | dict]:
-    with open(path, 'rb') as file:
+    with Path.open(path, "rb") as file:
         try:
             return tomllib.load(file)
-        except tomllib.TOMLDecodeError:
-            raise KatalogerParseException(f"Can't parse TOML in \"{path.name}\".")
+        except tomllib.TOMLDecodeError as parse_error:
+            message = f"Can't parse TOML in \"{path.name}\"."
+            raise KatalogerParseException(message) from parse_error
