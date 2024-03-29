@@ -23,6 +23,7 @@ jobs:
       run: ruff check --output-format=github
 
   run-tests:
+    needs: [ruff]
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
