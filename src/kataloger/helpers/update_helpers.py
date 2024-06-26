@@ -1,6 +1,6 @@
 import asyncio
 from collections import defaultdict
-from typing import Optional
+from typing import Dict, List, Optional
 
 from aiohttp import BasicAuth, ClientSession
 
@@ -12,14 +12,14 @@ from kataloger.helpers.xml_parse_helpers import try_parse_maven_group_metadata
 
 
 async def get_all_artifact_metadata(
-    artifacts: list[Artifact],
-    repositories: list[Repository],
+    artifacts: List[Artifact],
+    repositories: List[Repository],
     verbose: bool,
-) -> dict[Artifact, list[MetadataRepositoryInfo]]:
+) -> Dict[Artifact, List[MetadataRepositoryInfo]]:
     if not artifacts:
         return {}
 
-    search_results: dict[Artifact, list[MetadataRepositoryInfo]] = defaultdict(lambda: [])
+    search_results: Dict[Artifact, List[MetadataRepositoryInfo]] = defaultdict(lambda: [])
     for repository in repositories:
         result = await get_all_artifact_metadata_in_repository(repository, artifacts, verbose)
         for artifact, metadata in result.items():
@@ -29,9 +29,9 @@ async def get_all_artifact_metadata(
 
 async def get_all_artifact_metadata_in_repository(
     repository: Repository,
-    artifacts: list[Artifact],
+    artifacts: List[Artifact],
     verbose: bool,
-) -> dict[Artifact, MetadataRepositoryInfo]:
+) -> Dict[Artifact, MetadataRepositoryInfo]:
     if repository.requires_authorization():
         auth = BasicAuth(login=repository.user, password=repository.password)
     else:
@@ -44,7 +44,7 @@ async def get_all_artifact_metadata_in_repository(
             requests.append(request)
         results = await asyncio.gather(*requests)
 
-    artifact_to_metadata: dict[Artifact, MetadataRepositoryInfo] = {}
+    artifact_to_metadata: Dict[Artifact, MetadataRepositoryInfo] = {}
     for artifact, metadata in zip(artifacts, results):
         if metadata:
             artifact_to_metadata[artifact] = metadata

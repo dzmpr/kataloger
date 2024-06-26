@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from importlib.metadata import version
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from kataloger import package_name
 from kataloger.data.catalog import Catalog
@@ -79,7 +79,7 @@ def _get_kataloger_version() -> str:
     return version(package_name)
 
 
-def _get_catalogs(path_strings: list[str]) -> Optional[list[Catalog]]:
+def _get_catalogs(path_strings: List[str]) -> Optional[List[Catalog]]:
     if path_strings:
         return [Catalog.from_path(str_to_path(path_string=path_str, root_path=Path.cwd())) for path_str in path_strings]
 

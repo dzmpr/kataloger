@@ -1,6 +1,7 @@
 import re
 from functools import total_ordering
 from itertools import zip_longest
+from typing import List
 
 from kataloger.update_resolver.universal.version import Version
 
@@ -38,7 +39,7 @@ class UniversalVersion(Version):
         if self == other:
             return False
 
-        def to_digits_list(version_part: str) -> list[int]:
+        def to_digits_list(version_part: str) -> List[int]:
             return list(map(int, version_part.split(".")))
 
         # Compare numeric part of version. Missing digits assumed as 0.

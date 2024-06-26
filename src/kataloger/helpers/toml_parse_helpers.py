@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import tomllib
 from yarl import URL
@@ -15,9 +15,9 @@ from kataloger.helpers.path_helpers import str_to_path
 
 
 def load_configuration(configuration_path: Path) -> ConfigurationData:
-    catalogs: Optional[list[Catalog]] = None
-    library_repositories: Optional[list[Repository]] = None
-    plugin_repositories: Optional[list[Repository]] = None
+    catalogs: Optional[List[Catalog]] = None
+    library_repositories: Optional[List[Repository]] = None
+    plugin_repositories: Optional[List[Repository]] = None
 
     configuration_data = load_toml_to_dict(path=configuration_path)
     if "catalogs" in configuration_data:
@@ -37,16 +37,16 @@ def load_configuration(configuration_path: Path) -> ConfigurationData:
     )
 
 
-def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list[Plugin]]:
+def load_catalog(catalog_path: Path, verbose: bool) -> Tuple[List[Library], List[Plugin]]:
     catalog = load_toml_to_dict(catalog_path)
-    versions: dict[str, str] = catalog.pop("versions", {})
+    versions: Dict[str, str] = catalog.pop("versions", {})
     libraries = parse_libraries(catalog, versions, verbose)
     plugins = parse_plugins(catalog, versions, verbose)
 
     return libraries, plugins
 
 
-def parse_repositories(repositories_data: list[tuple]) -> Optional[list[Repository]]:
+def parse_repositories(repositories_data: List[Tuple]) -> Optional[List[Repository]]:
     if not repositories_data:
         return None
 
@@ -69,7 +69,7 @@ def parse_repositories(repositories_data: list[tuple]) -> Optional[list[Reposito
     return repositories
 
 
-def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Path]) -> Optional[list[Catalog]]:
+def parse_catalogs(data: Union[List, Dict], configuration_root_dir: Optional[Path]) -> Optional[List[Catalog]]:
     if not data:
         return None
 
@@ -101,7 +101,7 @@ def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Pat
     raise KatalogerParseException(message=f"Unexpected catalogs data format: \"{data}\".")
 
 
-def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: bool) -> list[Library]:
+def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose: bool) -> List[Library]:
     libraries = []
     if "libraries" not in catalog:
         return libraries
@@ -154,7 +154,7 @@ def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: boo
     return libraries
 
 
-def parse_plugins(catalog: dict[str, str | dict], versions: dict, verbose: bool) -> list[Plugin]:
+def parse_plugins(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose: bool) -> List[Plugin]:
     plugins = []
     if "plugins" not in catalog:
         return plugins
@@ -202,7 +202,7 @@ def __parse_declaration(declaration: str) -> Tuple[str, str]:
 
 
 def __get_version_by_reference(
-    versions: dict,
+    versions: Dict[str, str],
     version_ref: str,
     artifact_name: str,
 ) -> str:
@@ -213,7 +213,7 @@ def __get_version_by_reference(
     return version
 
 
-def __extract_optional_boolean(data: dict, key: str) -> Optional[bool]:
+def __extract_optional_boolean(data: Dict, key: str) -> Optional[bool]:
     value = data.get(key)
     if value is None or isinstance(value, bool):
         return value
@@ -222,7 +222,7 @@ def __extract_optional_boolean(data: dict, key: str) -> Optional[bool]:
     raise KatalogerParseException(message)
 
 
-def load_toml_to_dict(path: Path) -> dict[str, str | dict]:
+def load_toml_to_dict(path: Path) -> Dict[str, Union[Dict, str]]:
     with Path.open(path, "rb") as file:
         try:
             return tomllib.load(file)

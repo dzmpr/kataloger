@@ -1,9 +1,11 @@
+from typing import Dict, List, Tuple
+
 from kataloger.update_resolver.universal.universal_version import UniversalVersion
 
 
 class TestUniversalVersion:
     def test_can_handle_should_return_true_for_version_formats_that_can_be_parsed(self):
-        correct_versions = [
+        correct_versions: List[str] = [
             "1.2.3.4.5.6.7.8.9.0.1.2.3.4.5.6.7.8.9.0.1",  # Version with max numeric components
             "1.1.1",  # Semver version
             "00.00.02",  # Version with multiple zeros components
@@ -20,7 +22,7 @@ class TestUniversalVersion:
             assert UniversalVersion.can_handle(version)
 
     def test_can_handle_should_return_false_for_version_formats_that_cant_be_parsed(self):
-        incorrect_versions = [
+        incorrect_versions: List[str] = [
             "0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1",  # Too much numeric components
             "RELEASE130",  # Word-prefixed version
             "v1.3.0",  # v-prefix
@@ -31,7 +33,7 @@ class TestUniversalVersion:
             assert not UniversalVersion.can_handle(version)
 
     def test_is_pre_release_should_return_true_when_version_has_pre_release_postfix(self):
-        versions = [
+        versions: List[str] = [
             "1.2.3-alpha03",
             "1.9.0-Beta",
             "16.4.2-pre.49",
@@ -43,7 +45,7 @@ class TestUniversalVersion:
             assert UniversalVersion(version).is_pre_release()
 
     def test_is_pre_release_should_return_false_when_version_has_no_pre_release_postfix(self):
-        versions = [
+        versions: List[str] = [
             "1.2.3",
             "131",
             "10.20",
@@ -52,7 +54,7 @@ class TestUniversalVersion:
             assert not UniversalVersion(version).is_pre_release()
 
     def test_pre_release_number_should_be_extracted_as_int_from_version_if_pre_release_part_contains_number(self):
-        versions_to_numbers = {
+        versions_to_numbers: Dict[str, int] = {
             "1.2.3-alpha1": 1,
             "1.2.3-rc003": 3,
             "1.2.3-beta.4": 4,
@@ -61,7 +63,7 @@ class TestUniversalVersion:
             assert UniversalVersion(version).pre_release_number == expected_pre_release_number
 
     def test_pre_release_number_should_be_extracted_as_0_from_version_if_pre_release_part_not_contains_number(self):
-        versions = [
+        versions: List[str] = [
             "1.2.3",
             "1.2.3-beta",
         ]
@@ -70,7 +72,7 @@ class TestUniversalVersion:
             assert UniversalVersion(version).pre_release_number == expected_pre_release_number
 
     def test_pre_release_index_should_be_calculated_correctly_and_case_independent(self):
-        versions_to_index = {
+        versions_to_index: Dict[str, int] = {
             "1.2.3-unexpected-pre-release-name01": -1,
             "1.2.3-dev01": 0,
             "1.2.3-alpha01": 1,
@@ -83,18 +85,18 @@ class TestUniversalVersion:
             assert UniversalVersion(version)._pre_release_index() == expected_index
 
     def test_versions_should_considered_as_equal_when_version_string_representations_are_equals(self):
-        first_version = UniversalVersion("1.2.3-pre-release-name-005")
-        second_version = UniversalVersion("1.2.3-pre-release-name-005")
+        first_version: UniversalVersion = UniversalVersion("1.2.3-pre-release-name-005")
+        second_version: UniversalVersion = UniversalVersion("1.2.3-pre-release-name-005")
         assert first_version == second_version
 
     def test_versions_should_not_considered_as_equal_when_version_string_representations_are_not_equals(self):
-        first_version = UniversalVersion("1.2.3-pre-release-name-005")
-        second_version = UniversalVersion("1.2.3-pre-release-name-05")
+        first_version: UniversalVersion = UniversalVersion("1.2.3-pre-release-name-005")
+        second_version: UniversalVersion = UniversalVersion("1.2.3-pre-release-name-05")
         assert first_version != second_version
 
     def test_version_should_considered_not_equal_for_any_non_universal_version_type(self):
-        version = UniversalVersion("1.2.3")
-        comparing_objects = [
+        version: UniversalVersion = UniversalVersion("1.2.3")
+        comparing_objects: List[object] = [
             "1.2.3",
             None,
             True,
@@ -103,7 +105,7 @@ class TestUniversalVersion:
             assert obj != version
 
     def test_each_numeric_version_component_should_be_compared_with_corresponding_component_numerically(self):
-        versions = [
+        versions: List[Tuple[str, str, bool]] = [
             ("1.2.3", "1.2.3", False),
             ("0.0.0", "0.0.1", True),
             ("1.1.3", "1.2.3", True),
@@ -114,7 +116,7 @@ class TestUniversalVersion:
         self._version_comparison_test(versions)
 
     def test_missing_numeric_components_due_comparison_should_be_considered_as_zero(self):
-        versions = [
+        versions: List[Tuple[str, str, bool]] = [
             ("1.0.0", "1", False),
             ("1.0.1", "1", False),
             ("1.0.0.0.0", "1.0.0.0.1", True),
@@ -123,7 +125,7 @@ class TestUniversalVersion:
         self._version_comparison_test(versions)
 
     def test_should_considered_less_than_not_pre_release_version_when_numeric_parts_are_equal_pre_release_version(self):
-        versions = [
+        versions: List[Tuple[str, str, bool]] = [
             ("1.0.0-alpha", "1.0.0", True),
             ("1.0.0-beta01", "1.0.0", True),
             ("1.0.0-some-pre-release", "1.0.0", True),
@@ -131,7 +133,7 @@ class TestUniversalVersion:
         self._version_comparison_test(versions)
 
     def test_should_compare_by_pre_release_numbers_when_numeric_parts_and_pre_release_names_are_equal(self):
-        versions = [
+        versions: List[Tuple[str, str, bool]] = [
             ("1.0.0-alpha01", "1.0.0-alpha02", True),
             ("1.0.0-alpha01", "1.0.0-alpha2", True),
             ("1.0.0-alpha100", "1.0.0-alpha101", True),
@@ -140,7 +142,7 @@ class TestUniversalVersion:
         self._version_comparison_test(versions)
 
     def test_should_compare_by_pre_release_index_when_numeric_parts_are_equal_and_pre_release_names_are_not_equal(self):
-        versions = [
+        versions: List[Tuple[str, str, bool]] = [
             ("1.0.0-alpha", "1.0.0-beta100", True),
             ("1.0.0-dev", "1.0.0-rc100", True),
             ("1.0.0-beta", "1.0.0-rc100", True),
@@ -149,7 +151,7 @@ class TestUniversalVersion:
         self._version_comparison_test(versions)
 
     @staticmethod
-    def _version_comparison_test(data: list[tuple[str, str, bool]]):
+    def _version_comparison_test(data: List[Tuple[str, str, bool]]):
         for (first_version, second_version, expected_result) in data:
             actual_result = UniversalVersion(first_version) < UniversalVersion(second_version)
             assert actual_result == expected_result

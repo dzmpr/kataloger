@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from kataloger.data.artifact_metadata import ArtifactMetadata
 from kataloger.helpers.xml_parse_helpers import try_parse_maven_group_metadata
@@ -187,7 +187,7 @@ class TestXmlParseHelpers:
     def _create_xml_response(
         latest_version: Optional[str],
         release_version: Optional[str],
-        versions: list[str],
+        versions: List[str],
         last_updated: Optional[int],
     ) -> str:
         latest_version_element = f"<latest>{latest_version}</latest>" if latest_version else ""

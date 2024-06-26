@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from kataloger.data.artifact.artifact import Artifact
 from kataloger.data.artifact_update import ArtifactUpdate
@@ -13,7 +13,7 @@ class UniversalUpdateResolver(UpdateResolver):
 
     def __init__(
         self,
-        version_factories: list[VersionFactory[Version]],
+        version_factories: List[VersionFactory[Version]],
         suggest_unstable_updates: bool,
     ):
         self.version_factories = version_factories
@@ -22,11 +22,11 @@ class UniversalUpdateResolver(UpdateResolver):
     def resolve(
         self,
         artifact: Artifact,
-        repositories_metadata: list[MetadataRepositoryInfo],
-    ) -> tuple[UpdateResolution, Optional[ArtifactUpdate]]:
+        repositories_metadata: List[MetadataRepositoryInfo],
+    ) -> Tuple[UpdateResolution, Optional[ArtifactUpdate]]:
         recently_updated_repository = self.__most_recently_updated_repository(repositories_metadata)
         current_version_repository = self.__repository_with_current_version(artifact.version, repositories_metadata)
-        repositories_to_check: list[MetadataRepositoryInfo] = []
+        repositories_to_check: List[MetadataRepositoryInfo] = []
         if current_version_repository and recently_updated_repository != current_version_repository:
             repositories_to_check.append(current_version_repository)
         repositories_to_check.append(recently_updated_repository)
@@ -49,7 +49,7 @@ class UniversalUpdateResolver(UpdateResolver):
         artifact: Artifact,
         version_factory: VersionFactory,
         repository_metadata: MetadataRepositoryInfo,
-    ) -> tuple[UpdateResolution, Optional[ArtifactUpdate]]:
+    ) -> Tuple[UpdateResolution, Optional[ArtifactUpdate]]:
         current_version = artifact.version
         if not version_factory.can_create(current_version):
             return UpdateResolution.CANT_RESOLVE, None
@@ -79,14 +79,14 @@ class UniversalUpdateResolver(UpdateResolver):
 
     @staticmethod
     def __most_recently_updated_repository(
-        repositories_metadata: list[MetadataRepositoryInfo],
+        repositories_metadata: List[MetadataRepositoryInfo],
     ) -> MetadataRepositoryInfo:
         return max(repositories_metadata, key=lambda rm: rm.metadata.last_updated)
 
     @staticmethod
     def __repository_with_current_version(
         current_version: str,
-        repositories_metadata: list[MetadataRepositoryInfo],
+        repositories_metadata: List[MetadataRepositoryInfo],
     ) -> Optional[MetadataRepositoryInfo]:
         for repository_metadata in repositories_metadata:
             if current_version in repository_metadata.metadata.versions:

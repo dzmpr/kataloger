@@ -1,7 +1,7 @@
 import sys
 from importlib.resources import as_file, files
 from pathlib import Path
-from typing import Optional, TypeVar
+from typing import List, Optional, Tuple, TypeVar
 
 from kataloger import package_name
 from kataloger.cli.argument_parser import parse_arguments
@@ -35,9 +35,9 @@ def get_configuration() -> KatalogerConfiguration:
     args_cd: ConfigurationData = arguments.configuration_data
     conf_cd: ConfigurationData = load_configuration_data(arguments.configuration_path)
 
-    catalogs: list[Catalog] = get_catalogs(args_cd.catalogs, conf_cd.catalogs)
-    library_repositories: list[Repository]
-    plugin_repositories: list[Repository]
+    catalogs: List[Catalog] = get_catalogs(args_cd.catalogs, conf_cd.catalogs)
+    library_repositories: List[Repository]
+    plugin_repositories: List[Repository]
     library_repositories, plugin_repositories = get_repositories(
         arg_library_repositories=args_cd.library_repositories,
         arg_plugin_repositories=args_cd.plugin_repositories,
@@ -59,7 +59,7 @@ def get_configuration() -> KatalogerConfiguration:
     )
 
 
-def get_catalogs(arg_catalogs: Optional[list[Catalog]], conf_catalogs: Optional[list[Catalog]]) -> list[Catalog]:
+def get_catalogs(arg_catalogs: Optional[List[Catalog]], conf_catalogs: Optional[List[Catalog]]) -> List[Catalog]:
     if arg_catalogs:
         return arg_catalogs
 
@@ -67,7 +67,7 @@ def get_catalogs(arg_catalogs: Optional[list[Catalog]], conf_catalogs: Optional[
         return conf_catalogs
 
     # If catalogs not provided via command line arguments or specified in configuration trying to find them in cwd.
-    cwd_catalogs: Optional[list[Catalog]] = find_cwd_catalogs()
+    cwd_catalogs: Optional[List[Catalog]] = find_cwd_catalogs()
     if cwd_catalogs:
         return cwd_catalogs
 
@@ -78,13 +78,13 @@ def get_catalogs(arg_catalogs: Optional[list[Catalog]], conf_catalogs: Optional[
 
 
 def get_repositories(
-    arg_library_repositories: Optional[list[Repository]],
-    arg_plugin_repositories: Optional[list[Repository]],
-    conf_library_repositories: Optional[list[Repository]],
-    conf_plugin_repositories: Optional[list[Repository]],
-) -> tuple[list[Repository], list[Repository]]:
-    library_repositories: list[Repository]
-    plugin_repositories: list[Repository]
+    arg_library_repositories: Optional[List[Repository]],
+    arg_plugin_repositories: Optional[List[Repository]],
+    conf_library_repositories: Optional[List[Repository]],
+    conf_plugin_repositories: Optional[List[Repository]],
+) -> Tuple[List[Repository], List[Repository]]:
+    library_repositories: List[Repository]
+    plugin_repositories: List[Repository]
     if arg_library_repositories or arg_plugin_repositories:
         library_repositories = arg_library_repositories if arg_library_repositories is not None else []
         plugin_repositories = arg_plugin_repositories if arg_plugin_repositories is not None else []
@@ -100,7 +100,7 @@ def get_repositories(
     raise KatalogerConfigurationException(message)
 
 
-def find_cwd_catalogs() -> Optional[list[Catalog]]:
+def find_cwd_catalogs() -> Optional[List[Catalog]]:
     catalog_files = Path.cwd().glob("*.versions.toml")
     catalog_paths = filter(file_exists, catalog_files)
     if not catalog_paths:

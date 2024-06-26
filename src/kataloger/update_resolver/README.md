@@ -22,8 +22,8 @@ class EagerlyUpdateResolver(UpdateResolver):
     def resolve(
         self,
         artifact: Artifact,
-        repositories_metadata: list[MetadataRepositoryInfo],
-    ) -> tuple[UpdateResolution, Optional[ArtifactUpdate]]:
+        repositories_metadata: List[MetadataRepositoryInfo],
+    ) -> Tuple[UpdateResolution, Optional[ArtifactUpdate]]:
         current_version = artifact.version
         most_recently_updated_repo = max(repositories_metadata, key=lambda rm: rm.metadata.last_updated)
         if most_recently_updated_repo.metadata.latest_version == current_version:

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 from kataloger.data.catalog import Catalog
 from kataloger.data.repository import Repository
@@ -6,9 +7,9 @@ from kataloger.data.repository import Repository
 
 @dataclass(frozen=True)
 class KatalogerConfiguration:
-    catalogs: list[Catalog]
-    library_repositories: list[Repository]
-    plugin_repositories: list[Repository]
+    catalogs: List[Catalog]
+    library_repositories: List[Repository]
+    plugin_repositories: List[Repository]
     verbose: bool
     suggest_unstable_updates: bool
     fail_on_updates: bool

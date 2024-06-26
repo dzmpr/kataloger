@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 from unittest.mock import Mock
 
 import pytest
@@ -17,13 +17,13 @@ from kataloger.exceptions.kataloger_configuration_exception import KatalogerConf
 
 class TestConfigurationProvider:
 
-    default_arg_catalogs: list[Catalog] = [Catalog(name="arg_catalog", path=Path())]
-    default_conf_catalogs: list[Catalog] = [Catalog(name="conf_catalog", path=Path())]
-    default_cwd_catalogs: list[Catalog] = [Catalog(name="cwd_catalog", path=Path())]
-    default_arg_library_repositories: list[Repository] = [Repository(name="arg_library_repository", address=URL())]
-    default_arg_plugin_repositories: list[Repository] = [Repository(name="arg_plugin_repository", address=URL())]
-    default_conf_library_repositories: list[Repository] = [Repository(name="conf_library_repository", address=URL())]
-    default_conf_plugin_repositories: list[Repository] = [Repository(name="conf_plugin_repository", address=URL())]
+    default_arg_catalogs: List[Catalog] = [Catalog(name="arg_catalog", path=Path())]
+    default_conf_catalogs: List[Catalog] = [Catalog(name="conf_catalog", path=Path())]
+    default_cwd_catalogs: List[Catalog] = [Catalog(name="cwd_catalog", path=Path())]
+    default_arg_library_repositories: List[Repository] = [Repository(name="arg_library_repository", address=URL())]
+    default_arg_plugin_repositories: List[Repository] = [Repository(name="arg_plugin_repository", address=URL())]
+    default_conf_library_repositories: List[Repository] = [Repository(name="conf_library_repository", address=URL())]
+    default_conf_plugin_repositories: List[Repository] = [Repository(name="conf_plugin_repository", address=URL())]
 
     def test_should_return_arg_catalogs_when_arg_catalogs_is_not_none_or_empty(self):
         self.__test_get_catalogs(
@@ -250,15 +250,15 @@ class TestConfigurationProvider:
 
     @staticmethod
     def __test_get_repositories(
-        arg_library_repositories: Optional[list[Repository]],
-        arg_plugin_repositories: Optional[list[Repository]],
-        conf_library_repositories: Optional[list[Repository]],
-        conf_plugin_repositories: Optional[list[Repository]],
-        expected_library_repositories: list[Repository],
-        expected_plugin_repositories: list[Repository],
+        arg_library_repositories: Optional[List[Repository]],
+        arg_plugin_repositories: Optional[List[Repository]],
+        conf_library_repositories: Optional[List[Repository]],
+        conf_plugin_repositories: Optional[List[Repository]],
+        expected_library_repositories: List[Repository],
+        expected_plugin_repositories: List[Repository],
     ):
-        actual_library_repositories: list[Repository]
-        actual_plugin_repositories: list[Repository]
+        actual_library_repositories: List[Repository]
+        actual_plugin_repositories: List[Repository]
         actual_library_repositories, actual_plugin_repositories = get_repositories(
             arg_library_repositories=arg_library_repositories,
             arg_plugin_repositories=arg_plugin_repositories,
@@ -271,12 +271,12 @@ class TestConfigurationProvider:
 
     @staticmethod
     def __test_get_catalogs(
-        arg_catalogs: Optional[list[Catalog]],
-        conf_catalogs: Optional[list[Catalog]],
-        cwd_catalogs: Optional[list[Catalog]],
-        expected_catalogs: list[Catalog],
+        arg_catalogs: Optional[List[Catalog]],
+        conf_catalogs: Optional[List[Catalog]],
+        cwd_catalogs: Optional[List[Catalog]],
+        expected_catalogs: List[Catalog],
     ):
         configuration_provider.find_cwd_catalogs = Mock(return_value=cwd_catalogs)
-        actual_catalogs: list[Catalog] = get_catalogs(arg_catalogs, conf_catalogs)
+        actual_catalogs: List[Catalog] = get_catalogs(arg_catalogs, conf_catalogs)
 
         assert actual_catalogs == expected_catalogs
