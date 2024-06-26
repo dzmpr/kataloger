@@ -1,27 +1,40 @@
 from pathlib import Path
-from typing import Tuple
+from typing import Optional, Tuple, Union
 
 import tomllib
 from yarl import URL
 
 from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
+from kataloger.data.catalog import Catalog
+from kataloger.data.configuration_data import ConfigurationData
 from kataloger.data.repository import Repository
 from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
 from kataloger.helpers.log_helpers import log_warning
+from kataloger.helpers.path_helpers import str_to_path
 
 
-def load_repositories(repositories_path: Path) -> tuple[list[Repository], list[Repository]]:
-    library_repositories: list[Repository] = []
-    plugin_repositories: list[Repository] = []
+def load_configuration(configuration_path: Path) -> ConfigurationData:
+    catalogs: Optional[list[Catalog]] = None
+    library_repositories: Optional[list[Repository]] = None
+    plugin_repositories: Optional[list[Repository]] = None
 
-    repositories_data = load_toml_to_dict(path=repositories_path)
-    if "libraries" in repositories_data:
-        library_repositories = parse_repositories(list(repositories_data["libraries"].items()))
-    if "plugins" in repositories_data:
-        plugin_repositories = parse_repositories(list(repositories_data["plugins"].items()))
+    configuration_data = load_toml_to_dict(path=configuration_path)
+    if "catalogs" in configuration_data:
+        catalogs = parse_catalogs(configuration_data["catalogs"], configuration_root_dir=configuration_path.parent)
+    if "libraries" in configuration_data:
+        library_repositories = parse_repositories(list(configuration_data["libraries"].items()))
+    if "plugins" in configuration_data:
+        plugin_repositories = parse_repositories(list(configuration_data["plugins"].items()))
 
-    return library_repositories, plugin_repositories
+    return ConfigurationData(
+        catalogs=catalogs,
+        library_repositories=library_repositories,
+        plugin_repositories=plugin_repositories,
+        verbose=__extract_optional_boolean(configuration_data, key="verbose"),
+        suggest_unstable_updates=__extract_optional_boolean(configuration_data, key="suggest_unstable_updates"),
+        fail_on_updates=__extract_optional_boolean(configuration_data, key="fail_on_updates"),
+    )
 
 
 def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list[Plugin]]:
@@ -33,7 +46,10 @@ def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list
     return libraries, plugins
 
 
-def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
+def parse_repositories(repositories_data: list[tuple]) -> Optional[list[Repository]]:
+    if not repositories_data:
+        return None
+
     repositories = []
     for repository_data in repositories_data:
         match repository_data:
@@ -51,6 +67,38 @@ def parse_repositories(repositories_data: list[tuple]) -> list[Repository]:
         repositories.append(repository)
 
     return repositories
+
+
+def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Path]) -> Optional[list[Catalog]]:
+    if not data:
+        return None
+
+    catalogs = []
+    if isinstance(data, list):
+        for path in data:
+            if not isinstance(path, str):
+                raise KatalogerParseException(message=f"Unexpected catalog path: \"{path}\".")
+            if not path.strip():
+                raise KatalogerParseException(message="Catalog path can't be empty!")
+
+            catalogs.append(Catalog.from_path(path=str_to_path(path, root_path=configuration_root_dir)))
+        return catalogs
+
+    if isinstance(data, dict):
+        for name, path in data.items():
+            if not isinstance(name, str):
+                raise KatalogerParseException(message=f"Unexpected catalog name: \"{name}\".")
+            if not isinstance(path, str):
+                raise KatalogerParseException(message=f"Unexpected catalog path: \"{path}\".")
+            if not name.strip():
+                raise KatalogerParseException(message="Catalog name can't be empty!")
+            if not path.strip():
+                raise KatalogerParseException(message=f"Catalog \"{name}\" has empty path!")
+
+            catalogs.append(Catalog(name=name, path=str_to_path(path, root_path=configuration_root_dir)))
+        return catalogs
+
+    raise KatalogerParseException(message=f"Unexpected catalogs data format: \"{data}\".")
 
 
 def parse_libraries(catalog: dict[str, str | dict], versions: dict, verbose: bool) -> list[Library]:
@@ -163,6 +211,15 @@ def __get_version_by_reference(
         raise KatalogerParseException(message)
 
     return version
+
+
+def __extract_optional_boolean(data: dict, key: str) -> Optional[bool]:
+    value = data.get(key)
+    if value is None or isinstance(value, bool):
+        return value
+
+    message = f"Configuration field \"{key}\" has incorrect value \"{value}\", while expected boolean type."
+    raise KatalogerParseException(message)
 
 
 def load_toml_to_dict(path: Path) -> dict[str, str | dict]:

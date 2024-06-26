@@ -1,7 +1,7 @@
+from pyexpat import ExpatError
 from typing import Optional
 
 import xmltodict
-from pyexpat import ExpatError
 
 from kataloger.data.artifact_metadata import ArtifactMetadata
 

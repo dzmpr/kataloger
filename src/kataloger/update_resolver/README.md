@@ -35,9 +35,11 @@ class EagerlyUpdateResolver(UpdateResolver):
 Then we need to build an instance of [`CatalogUpdater`](../catalog_updater.py) with this resolver:
 
 ```python
-catalog_updater = (CatalogUpdaterBuilder()
-                   .add_resolver(EagerlyUpdateResolver())
-                   .build())
+catalog_updater = CatalogUpdater(
+    # ..
+    update_resolvers=[EagerlyUpdateResolver()],
+    # ..
+)
 ```
 
 ### Special version notation

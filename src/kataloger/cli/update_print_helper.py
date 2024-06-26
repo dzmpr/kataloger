@@ -7,11 +7,6 @@ def print_catalog_updates(
     catalog_count: int,
     verbose: bool,
 ) -> None:
-    if catalog_name.endswith(".versions.toml"):
-        catalog_name = catalog_name.removesuffix(".versions.toml")
-    else:
-        catalog_name = catalog_name
-
     if catalog_count > 1:
         if updates:
             print(f"Updates for \"{catalog_name}\" catalog:")

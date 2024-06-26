@@ -1,5 +1,3 @@
 ### Changelog
 
-* Support update multiple gradle version catalogs.
-* If repositories not provided default set of repositories will be used (Maven Central, Google, Gradle Plugin Portal).
-* Fix: correct handle absence of `latest`, `release`, `lastUpdated` tags and just one version of dependency in artifact metadata.
+* Repositories configuration file replaced with kataloger configuration file, where beside repositories can be specified catalog paths and parameters. 

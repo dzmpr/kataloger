@@ -3,6 +3,15 @@ root = true
 [*]
 insert_final_newline = true
 indent_style = space
+max_line_length = 120
+
+[*.py]
+ij_python_blank_line_at_file_end = true
+ij_python_optimize_imports_sort_imports = true
+ij_python_optimize_imports_sort_names_in_from_imports = true
+ij_python_optimize_imports_join_from_imports_with_same_source = true
+ij_python_call_parameters_right_paren_on_new_line = true
+ij_python_method_parameters_right_paren_on_new_line = true
 
 [*.{yml,yaml}]
 indent_size = 2

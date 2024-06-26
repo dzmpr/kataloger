@@ -1,1 +1,1 @@
-package_name = "kataloger"
+package_name: str = "kataloger"

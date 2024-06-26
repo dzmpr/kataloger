@@ -16,32 +16,56 @@ Kataloger can help update your project dependencies with ease! All you need is p
 ### How to use?
 Kataloger offers handy CLI which you can use locally or on CI.
 
-You can pass path to version catalog using `-p` parameter and path to repositories that should be used to search for with `-rp` parameter:
+You can pass path to version catalog using `-p` parameter and path to configuration with `-c` parameter:
 ```commandline
-kataloger -p ~/ProjectDir/libs.versions.toml -rp ~/ProjectDir/default.repositories.toml
+kataloger -p ~/ProjectDir/libs.versions.toml -c ~/ProjectDir/default.configuration.toml
 ```
-Repositories should be specified in separate `.toml` file separately for libraries and plugins. You can use [default](./src/kataloger/default.repositories.toml) repositories file as template.
+Repositories, where artifact updates will be searched for, should be specified in configuration file separately for libraries and plugins as shown below:
+```toml
+# ...
+[libraries]
+library_repository = "https://repository.link/library"
 
-If repositories not provided kataloger use [default](./src/kataloger/default.repositories.toml) set of repositories (Maven Central, Google Maven and Gradle Plugin Portal):
+[plugins]
+plugin_repository = "https://repository.link/plugin"
+```
+> Tip: You can use [default](./src/kataloger/default.configuration.toml) configuration file as template.
+
+Paths to catalogs also can be specified in configuration file:
+```toml
+# ...
+[catalogs]
+androix_catalog = "./androidx.versions.toml"
+kotlin_catalog = "./kotlin.versions.toml"
+```
+> Important: Relative paths are resolved to the root directory of configuration.
+
+And then you need specify only path to configuration:
 
 ```commandline
-kataloger -p ~/ProjectDir/libs.versions.toml
+kataloger -c ~/ProjectDir/project.configuration.toml
 ```
 
-Or you can omit paths to version catalog and repositories if they are located in current working directory. In this mode kataloger trying to find all catalogs (files with `.versions.toml` extension) and repositories in `default.repositories.toml` file in current directory:
+Or you can omit all parameters if configuration file or catalogs are located in current working directory. In this mode kataloger trying to find all catalogs (files with `.versions.toml` extension) and configuration in `default.configuration.toml` file in current directory:
 
 ```commandline
 cd ~/ProjectDir
 kataloger
 ```
 
+If configuration file not provided and can't be found in current working directory kataloger will use [default](./src/kataloger/default.configuration.toml) configuration with next repositories: Maven Central, Google Maven and Gradle Plugin Portal.
+
+```commandline
+kataloger -p ~/ProjectDir/libs.versions.toml
+```
+
 #### CLI options
 
 `-p [path]` or `--path [path]` — specifies path to gradle version catalog file. You can pass more than one version catalog path. If no path provided kataloger try to find version catalogs (files with extension `.versions.toml`) in current working directory.  
-`-rp [path]` or `--repositories-path [path]` — specifies path to .toml file with repositories credentials where updates will be looked for. If no path provided kataloger try to find default repositories file with name `default.repositories.toml` in current working directory. If repositories can't be found in current directory kataloger use predefined set of repositories (Maven Central, Google and Gradle Plugin Portal).  
+`-c [path]` or `--configuration [path]` — specifies path to .toml file with repositories credentials where updates will be looked for. If no path provided kataloger try to find default repositories file with name `default.configuration.toml` in current working directory. If repositories can't be found in current directory kataloger use predefined set of repositories (Maven Central, Google and Gradle Plugin Portal).  
 `-v` or `--verbose` — if specified print more info to console.  
 `-u` or `--suggest-unstable` — if specified suggest artifact update from stable version to unstable.  
-`-f` or `--fail-on-updates` — if specified return non-zero exit code when at least one update found. Can be useful on CI.
+`-f` or `--fail-on-updates` — if specified return non-zero exit code when at least one update found. Can be useful on CI.  
 
 ### Installation
 

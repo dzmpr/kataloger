@@ -1,3 +1,15 @@
+verbose = false
+suggest_unstable_updates = false
+fail_on_updates = false
+
+# In "catalogs" table paths to catalogs can be placed to omit console arguments:
+# [catalogs]
+# first = "./first.versions.toml"
+# second = "./second.versions.toml"
+# Or shorter, without names:
+# catalogs = ["./first.versions.toml", "./second.versions.toml"]
+# Note: relative paths are resolved to the root directory of configuration
+
 [libraries]
 # Place here repository links to find library updates
 maven_central = "https://repo.maven.apache.org/maven2/"

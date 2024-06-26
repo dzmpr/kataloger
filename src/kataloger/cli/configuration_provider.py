@@ -1,106 +1,121 @@
-from argparse import ArgumentParser
-from importlib.metadata import version
+import sys
 from importlib.resources import as_file, files
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TypeVar
 
 from kataloger import package_name
+from kataloger.cli.argument_parser import parse_arguments
+from kataloger.data.catalog import Catalog
+from kataloger.data.configuration_data import ConfigurationData
+from kataloger.data.kataloger_arguments import KatalogerArguments
 from kataloger.data.kataloger_configuration import KatalogerConfiguration
+from kataloger.data.repository import Repository
 from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.helpers.path_helpers import file_exists
+from kataloger.helpers.toml_parse_helpers import load_configuration
+
+T = TypeVar("T")
 
 
-def parse_configuration() -> KatalogerConfiguration:
-    parser = ArgumentParser(
-        prog="kataloger",
-        description="A Python command-line utility to discover updates for your gradle version catalogs.",
-        allow_abbrev=False,
-        epilog="Visit project repository to get more information.",
+def merge(
+    first: Optional[T],
+    second: Optional[T],
+    default: T,
+) -> T:
+    if first:
+        return first
+    if second:
+        return second
+
+    return default
+
+
+def get_configuration() -> KatalogerConfiguration:
+    arguments: KatalogerArguments = parse_arguments(*sys.argv[1:])
+    args_cd: ConfigurationData = arguments.configuration_data
+    conf_cd: ConfigurationData = load_configuration_data(arguments.configuration_path)
+
+    catalogs: list[Catalog] = get_catalogs(args_cd.catalogs, conf_cd.catalogs)
+    library_repositories: list[Repository]
+    plugin_repositories: list[Repository]
+    library_repositories, plugin_repositories = get_repositories(
+        arg_library_repositories=args_cd.library_repositories,
+        arg_plugin_repositories=args_cd.plugin_repositories,
+        conf_library_repositories=conf_cd.library_repositories,
+        conf_plugin_repositories=conf_cd.plugin_repositories,
     )
-    parser.add_argument(
-        "-p", "--path",
-        action="append",
-        dest="paths",
-        help="Path(s) to gradle version catalog. If catalog path not provided script looking for version catalogs in "
-             "current directory.",
-    )
-    parser.add_argument(
-        "-rp", "--repositories-path",
-        type=str,
-        dest="repositories_path",
-        metavar="path",
-        help="Path to .toml file with repositories info. If repositories path not provided script looking for "
-             "default.repositories.toml file in current directory.",
-    )
-    parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        dest="verbose",
-        help="Enables detailed output.",
-    )
-    parser.add_argument(
-        "-u", "--suggest-unstable",
-        action="store_true",
-        dest="suggest_unstable_updates",
-        help="Allow %(prog)s suggest update from stable version to unstable.",
-    )
-    parser.add_argument(
-        "-f", "--fail-on-updates",
-        action="store_true",
-        dest="fail_on_updates",
-        help="Exit with non-zero code when at least one update found.",
-    )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=f"%(prog)s {_get_kataloger_version()}",
-    )
-    arguments = parser.parse_args()
 
     return KatalogerConfiguration(
-        catalogs=_get_catalog_paths(arguments.paths),
-        repositories_path=_get_repositories_path(arguments.repositories_path),
-        verbose=arguments.verbose,
-        suggest_unstable_updates=arguments.suggest_unstable_updates,
-        fail_on_updates=arguments.fail_on_updates,
+        catalogs=catalogs,
+        library_repositories=library_repositories,
+        plugin_repositories=plugin_repositories,
+        verbose=merge(args_cd.verbose, conf_cd.verbose, default=False),
+        suggest_unstable_updates=merge(
+            args_cd.suggest_unstable_updates,
+            conf_cd.suggest_unstable_updates,
+            default=False,
+        ),
+        fail_on_updates=merge(args_cd.fail_on_updates, conf_cd.fail_on_updates, default=False),
     )
 
 
-def _get_kataloger_version() -> str:
-    if __name__ == '__main__':
-        return "indev"
-    return version(package_name)
+def get_catalogs(arg_catalogs: Optional[list[Catalog]], conf_catalogs: Optional[list[Catalog]]) -> list[Catalog]:
+    if arg_catalogs:
+        return arg_catalogs
+
+    if conf_catalogs:
+        return conf_catalogs
+
+    # If catalogs not provided via command line arguments or specified in configuration trying to find them in cwd.
+    cwd_catalogs: Optional[list[Catalog]] = find_cwd_catalogs()
+    if cwd_catalogs:
+        return cwd_catalogs
+
+    message = "Gradle version catalog not found in current directory. " \
+              "Please specify path to catalog via parameter, in configuration " \
+              "file or run tool from directory with catalog (*.versions.toml) file."
+    raise KatalogerConfigurationException(message)
 
 
-def _get_catalog_paths(path_strings: list[str]) -> list[Path]:
-    if path_strings:
-        return [_str_to_path(path) for path in path_strings]
+def get_repositories(
+    arg_library_repositories: Optional[list[Repository]],
+    arg_plugin_repositories: Optional[list[Repository]],
+    conf_library_repositories: Optional[list[Repository]],
+    conf_plugin_repositories: Optional[list[Repository]],
+) -> tuple[list[Repository], list[Repository]]:
+    library_repositories: list[Repository]
+    plugin_repositories: list[Repository]
+    if arg_library_repositories or arg_plugin_repositories:
+        library_repositories = arg_library_repositories if arg_library_repositories is not None else []
+        plugin_repositories = arg_plugin_repositories if arg_plugin_repositories is not None else []
+        return library_repositories, plugin_repositories
 
-    # If catalog path not provided try to find catalogs in cwd.
+    if conf_library_repositories or conf_plugin_repositories:
+        library_repositories = conf_library_repositories if conf_library_repositories is not None else []
+        plugin_repositories = conf_plugin_repositories if conf_plugin_repositories is not None else []
+        return library_repositories, plugin_repositories
+
+    message = "No repositories provided! You can specify repositories to " \
+              "search artifact updates through configuration file."
+    raise KatalogerConfigurationException(message)
+
+
+def find_cwd_catalogs() -> Optional[list[Catalog]]:
     catalog_files = Path.cwd().glob("*.versions.toml")
-    catalog_paths = list(filter(lambda path: path.exists() and path.is_file(), catalog_files))
+    catalog_paths = filter(file_exists, catalog_files)
     if not catalog_paths:
-        message = "Gradle version catalog not found in current directory. Please specify " \
-                   "path to catalog via parameter or run tool from directory with catalog."
-        raise KatalogerConfigurationException(message)
+        return None
 
-    return catalog_paths
+    return [Catalog.from_path(path) for path in catalog_paths]
 
 
-def _get_repositories_path(path_string: Optional[str]) -> Path:
-    if path_string:
-        return _str_to_path(path_string)
+def load_configuration_data(configuration_path: Optional[Path]) -> ConfigurationData:
+    if not configuration_path:
+        configuration_candidate = Path.cwd() / "default.configuration.toml"
+        if file_exists(configuration_candidate):
+            configuration_path = configuration_candidate
+        else:
+            with as_file(files(package_name).joinpath("default.configuration.toml")) as path:
+                configuration_path = path
 
-    repositories_candidate = Path.cwd() / "default.repositories.toml"
-    if repositories_candidate.exists() and repositories_candidate.is_file():
-        return repositories_candidate
-
-    with as_file(files(package_name).joinpath("default.repositories.toml")) as path:
-        return path
-
-
-def _str_to_path(path_string: str) -> Path:
-    path = Path(path_string)
-    if not (path.exists() or path.is_file()):
-        raise KatalogerConfigurationException(message=f"Incorrect path: {path_string}.")
-
-    return path
+    return load_configuration(configuration_path)
