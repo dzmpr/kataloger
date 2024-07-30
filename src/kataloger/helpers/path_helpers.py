@@ -19,7 +19,7 @@ def str_to_path(path_string: str, root_path: Optional[Path] = None) -> Path:
         path = (root_path / path).resolve()
 
     if not file_exists(path):
-        raise KatalogerConfigurationException(message=f"Incorrect path: \"{path_string}\".")
+        raise KatalogerConfigurationException(message=f'Incorrect path: "{path_string}".')
 
     return path
 

@@ -19,7 +19,7 @@ async def get_all_artifact_metadata(
     if not artifacts:
         return {}
 
-    search_results: Dict[Artifact, List[MetadataRepositoryInfo]] = defaultdict(lambda: [])
+    search_results: Dict[Artifact, List[MetadataRepositoryInfo]] = defaultdict(list)
     for repository in repositories:
         result = await get_all_artifact_metadata_in_repository(repository, artifacts, verbose)
         for artifact, metadata in result.items():
@@ -44,11 +44,7 @@ async def get_all_artifact_metadata_in_repository(
             requests.append(request)
         results = await asyncio.gather(*requests)
 
-    artifact_to_metadata: Dict[Artifact, MetadataRepositoryInfo] = {}
-    for artifact, metadata in zip(artifacts, results):
-        if metadata:
-            artifact_to_metadata[artifact] = metadata
-    return artifact_to_metadata
+    return {artifact: metadata for artifact, metadata in zip(artifacts, results) if metadata}
 
 
 async def get_artifact_metadata(

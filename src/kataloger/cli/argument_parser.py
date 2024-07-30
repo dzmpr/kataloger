@@ -74,7 +74,7 @@ def parse_arguments(*args: str) -> KatalogerArguments:
 
 
 def _get_kataloger_version() -> str:
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         return "indev"
     return version(package_name)
 

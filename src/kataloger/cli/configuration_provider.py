@@ -71,9 +71,9 @@ def get_catalogs(arg_catalogs: Optional[List[Catalog]], conf_catalogs: Optional[
     if cwd_catalogs:
         return cwd_catalogs
 
-    message = "Gradle version catalog not found in current directory. " \
-              "Please specify path to catalog via parameter, in configuration " \
-              "file or run tool from directory with catalog (*.versions.toml) file."
+    message = ("Gradle version catalog not found in current directory. "
+               "Please specify path to catalog via parameter, in configuration "
+               "file or run tool from directory with catalog (*.versions.toml) file.")
     raise KatalogerConfigurationException(message)
 
 
@@ -95,8 +95,8 @@ def get_repositories(
         plugin_repositories = conf_plugin_repositories if conf_plugin_repositories is not None else []
         return library_repositories, plugin_repositories
 
-    message = "No repositories provided! You can specify repositories to " \
-              "search artifact updates through configuration file."
+    message = ("No repositories provided! You can specify repositories to "
+               "search artifact updates through configuration file.")
     raise KatalogerConfigurationException(message)
 
 

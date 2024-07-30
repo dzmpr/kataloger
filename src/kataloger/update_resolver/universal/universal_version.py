@@ -67,13 +67,7 @@ class UniversalVersion(Version):
                     return False
             return False
 
-        if not self.is_pre_release() and other.is_pre_release():
-            return False
-
-        if self.is_pre_release() and not other.is_pre_release():
-            return True
-
-        return False
+        return self.is_pre_release() and not other.is_pre_release()
 
     def _pre_release_index(self) -> int:
         lowercase_pre_release_name = self.pre_release_name.lower()

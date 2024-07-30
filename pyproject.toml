@@ -49,26 +49,35 @@ pythonpath = "src/"
 line-length = 120
 indent-width = 4
 target-version = "py38"
+required-version = ">=0.5.5"
+output-format = "concise"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
+    "F", # pyflakes
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "I", # isort
+    "UP", # pyupgrade
+    "YTT", # flake8-2020
     "ANN", # flake8-annotations
+    "B", # flake8-bugbear
+    "A", # flake8-builtins
     "COM", # flake8-commas
-    "C4",  # flake8-comprehensions
-    "EM",  # flake8-errmsg
-    "UP",  # pyupgrade
+    "C4", # flake8-comprehensions
+    "EM", # flake8-errmsg
+    "ISC", # flake8-implicit-str-concat
+    "PIE", # flake8-pie
     "PYI", # flake8-pyi
     "PT", # flake8-pytest-style
+    "Q", # flake8-quotes
+    "RSE", # flake8-raise
     "RET", # flake8-return
     "SIM", # flake8-simplify
     "ARG", # flake8-unused-arguments
     "PTH", # flake8-use-pathlib
+    "PERF", # perflint
 ]
 ignore = [
     "ANN101", # will be deprecated

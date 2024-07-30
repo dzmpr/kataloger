@@ -77,7 +77,7 @@ def parse_catalogs(data: Union[List, Dict], configuration_root_dir: Optional[Pat
     if isinstance(data, list):
         for path in data:
             if not isinstance(path, str):
-                raise KatalogerParseException(message=f"Unexpected catalog path: \"{path}\".")
+                raise KatalogerParseException(message=f'Unexpected catalog path: "{path}".')
             if not path.strip():
                 raise KatalogerParseException(message="Catalog path can't be empty!")
 
@@ -87,18 +87,18 @@ def parse_catalogs(data: Union[List, Dict], configuration_root_dir: Optional[Pat
     if isinstance(data, dict):
         for name, path in data.items():
             if not isinstance(name, str):
-                raise KatalogerParseException(message=f"Unexpected catalog name: \"{name}\".")
+                raise KatalogerParseException(message=f'Unexpected catalog name: "{name}".')
             if not isinstance(path, str):
-                raise KatalogerParseException(message=f"Unexpected catalog path: \"{path}\".")
+                raise KatalogerParseException(message=f'Unexpected catalog path: "{path}".')
             if not name.strip():
                 raise KatalogerParseException(message="Catalog name can't be empty!")
             if not path.strip():
-                raise KatalogerParseException(message=f"Catalog \"{name}\" has empty path!")
+                raise KatalogerParseException(message=f'Catalog "{name}" has empty path!')
 
             catalogs.append(Catalog(name=name, path=str_to_path(path, root_path=configuration_root_dir)))
         return catalogs
 
-    raise KatalogerParseException(message=f"Unexpected catalogs data format: \"{data}\".")
+    raise KatalogerParseException(message=f'Unexpected catalogs data format: "{data}".')
 
 
 def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose: bool) -> List[Library]:
@@ -146,7 +146,7 @@ def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbos
                 libraries.append(library)
             case {"module": str(module)}:
                 if verbose:
-                    log_warning(f"Library \"{module}\" has no version in catalog.")
+                    log_warning(f'Library "{module}" has no version in catalog.')
             case _:
                 message = f"Unknown library notation: {library}"
                 raise KatalogerParseException(message)
@@ -185,7 +185,7 @@ def parse_plugins(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose:
                 plugins.append(plugin)
             case {"id": str(plugin_id)}:
                 if verbose:
-                    log_warning(f"Plugin \"{plugin_id}\" has no version in catalog.")
+                    log_warning(f'Plugin "{plugin_id}" has no version in catalog.')
             case _:
                 message = f"Unknown plugin notation: {plugin}"
                 raise KatalogerParseException(message)
@@ -194,9 +194,9 @@ def parse_plugins(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose:
 
 
 def __parse_declaration(declaration: str) -> Tuple[str, str]:
-    components = declaration.rsplit(':', 1)
+    components = declaration.rsplit(":", 1)
     if len(components) != 2 or not (components[0].strip() and components[1].strip()):
-        message = f"Unknown declaration format: \"{declaration}\"."
+        message = f'Unknown declaration format: "{declaration}".'
         raise KatalogerParseException(message)
     return components[0], components[1]
 
@@ -207,7 +207,7 @@ def __get_version_by_reference(
     artifact_name: str,
 ) -> str:
     if not (version := versions.get(version_ref)):
-        message = f"Version for \"{artifact_name}\" not specified by reference \"{version_ref}\"."
+        message = f'Version for "{artifact_name}" not specified by reference "{version_ref}".'
         raise KatalogerParseException(message)
 
     return version
@@ -218,7 +218,7 @@ def __extract_optional_boolean(data: Dict, key: str) -> Optional[bool]:
     if value is None or isinstance(value, bool):
         return value
 
-    message = f"Configuration field \"{key}\" has incorrect value \"{value}\", while expected boolean type."
+    message = f'Configuration field "{key}" has incorrect value "{value}", while expected boolean type.'
     raise KatalogerParseException(message)
 
 
