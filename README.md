@@ -1,9 +1,9 @@
 ## Kataloger
 
+[![Python version](https://img.shields.io/badge/python-3.8-blue.svg)](https://pypi.python.org/pypi/kataloger)
 [![Latest version](https://img.shields.io/pypi/v/kataloger.svg?style=flat&label=Latest&color=%234B78E6&logo=&logoColor=white)](https://pypi.python.org/pypi/kataloger)
 [![Downloads](https://static.pepy.tech/badge/kataloger/month)](https://pepy.tech/project/kataloger)
 [![Tests](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml)
-[![Python version](https://img.shields.io/badge/python-3.11-blue.svg)](https://pypi.python.org/pypi/kataloger)
 
 Kataloger can help update your project dependencies with ease! All you need is point to `libs.versions.toml` file and supply it with repositories that you use in project.
 
@@ -69,7 +69,7 @@ kataloger -p ~/ProjectDir/libs.versions.toml
 
 ### Installation
 
-Kataloger available in Python Package Index (PyPI). You can install kataloger using pip:
+Kataloger available in Python Package Index (PyPI). You can install kataloger using pip (requires python 3.8 and greater):
 ```commandline
 pip install kataloger
 ```

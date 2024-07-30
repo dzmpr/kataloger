@@ -1,9 +1,7 @@
 import sys
-from importlib.resources import as_file, files
 from pathlib import Path
 from typing import List, Optional, Tuple, TypeVar
 
-from kataloger import package_name
 from kataloger.cli.argument_parser import parse_arguments
 from kataloger.data.catalog import Catalog
 from kataloger.data.configuration_data import ConfigurationData
@@ -11,6 +9,7 @@ from kataloger.data.kataloger_arguments import KatalogerArguments
 from kataloger.data.kataloger_configuration import KatalogerConfiguration
 from kataloger.data.repository import Repository
 from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.helpers.backport_helpers import get_package_file
 from kataloger.helpers.path_helpers import file_exists
 from kataloger.helpers.toml_parse_helpers import load_configuration
 
@@ -115,7 +114,6 @@ def load_configuration_data(configuration_path: Optional[Path]) -> Configuration
         if file_exists(configuration_candidate):
             configuration_path = configuration_candidate
         else:
-            with as_file(files(package_name).joinpath("default.configuration.toml")) as path:
-                configuration_path = path
+            configuration_path = get_package_file("default.configuration.toml")
 
     return load_configuration(configuration_path)

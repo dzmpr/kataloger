@@ -32,15 +32,15 @@ class UniversalUpdateResolver(UpdateResolver):
         repositories_to_check.append(recently_updated_repository)
 
         for repository in repositories_to_check:
-            for version_factory in self.version_factories:
-                (result, optional_update) = self.__resolve_update_in_repository(artifact, version_factory, repository)
-                match result:
-                    case UpdateResolution.CANT_RESOLVE:
-                        continue
-                    case UpdateResolution.NO_UPDATES:
-                        return result, optional_update
-                    case UpdateResolution.UPDATE_FOUND:
-                        return result, optional_update
+            for factory in self.version_factories:
+                (resolution, optional_update) = self.__resolve_update_in_repository(artifact, factory, repository)
+                if resolution == UpdateResolution.CANT_RESOLVE:
+                    continue
+                if resolution == UpdateResolution.NO_UPDATES or resolution == UpdateResolution.UPDATE_FOUND:
+                    return resolution, optional_update
+
+                message: str = f'Unexpected update resolution: "{resolution}".'
+                raise ValueError(message)
 
         return UpdateResolution.CANT_RESOLVE, None
 

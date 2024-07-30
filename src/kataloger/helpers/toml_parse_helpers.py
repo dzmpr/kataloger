@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
-import tomllib
 from yarl import URL
 
 from kataloger.data.artifact.library import Library
@@ -10,8 +9,10 @@ from kataloger.data.catalog import Catalog
 from kataloger.data.configuration_data import ConfigurationData
 from kataloger.data.repository import Repository
 from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
+from kataloger.helpers.backport_helpers import load_toml
 from kataloger.helpers.log_helpers import log_warning
 from kataloger.helpers.path_helpers import str_to_path
+from kataloger.helpers.structural_matching_helpers import match
 
 
 def load_configuration(configuration_path: Path) -> ConfigurationData:
@@ -19,13 +20,13 @@ def load_configuration(configuration_path: Path) -> ConfigurationData:
     library_repositories: Optional[List[Repository]] = None
     plugin_repositories: Optional[List[Repository]] = None
 
-    configuration_data = load_toml_to_dict(path=configuration_path)
+    configuration_data = load_toml(path=configuration_path)
     if "catalogs" in configuration_data:
         catalogs = parse_catalogs(configuration_data["catalogs"], configuration_root_dir=configuration_path.parent)
     if "libraries" in configuration_data:
-        library_repositories = parse_repositories(list(configuration_data["libraries"].items()))
+        library_repositories = parse_repositories(configuration_data["libraries"])
     if "plugins" in configuration_data:
-        plugin_repositories = parse_repositories(list(configuration_data["plugins"].items()))
+        plugin_repositories = parse_repositories(configuration_data["plugins"])
 
     return ConfigurationData(
         catalogs=catalogs,
@@ -38,7 +39,7 @@ def load_configuration(configuration_path: Path) -> ConfigurationData:
 
 
 def load_catalog(catalog_path: Path, verbose: bool) -> Tuple[List[Library], List[Plugin]]:
-    catalog = load_toml_to_dict(catalog_path)
+    catalog = load_toml(catalog_path)
     versions: Dict[str, str] = catalog.pop("versions", {})
     libraries = parse_libraries(catalog, versions, verbose)
     plugins = parse_plugins(catalog, versions, verbose)
@@ -46,24 +47,30 @@ def load_catalog(catalog_path: Path, verbose: bool) -> Tuple[List[Library], List
     return libraries, plugins
 
 
-def parse_repositories(repositories_data: List[Tuple]) -> Optional[List[Repository]]:
-    if not repositories_data:
+def parse_repositories(data: Dict) -> Optional[List[Repository]]:
+    if not data:
         return None
 
+    if not isinstance(data, dict):
+        raise KatalogerParseException(message="Unexpected repository data.")
+
     repositories = []
-    for repository_data in repositories_data:
-        match repository_data:
-            case (str(name), str(address)):
-                repository = Repository(name, URL(address))
-            case (str(name), {"address": str(address), "user": str(user), "password": str(password)}):
-                repository = Repository(
-                    name=name,
-                    address=URL(address),
-                    user=user,
-                    password=password,
-                )
-            case _:
-                raise KatalogerParseException(message="Unexpected repository data.")
+    for name, repository_data in data.items():
+        if not isinstance(name, str):
+            raise KatalogerParseException(message=f'Unexpected repository name: "{name}".')
+
+        repository: Repository
+        if isinstance(repository_data, str):
+            repository = Repository(name=name, address=URL(repository_data))
+        elif mr := match(repository_data, pattern={"address": str, "user": str, "password": str}):
+            repository = Repository(
+                name=name,
+                address=URL(mr.address),
+                user=mr.user,
+                password=mr.password,
+            )
+        else:
+            raise KatalogerParseException(message="Unexpected repository data.")
         repositories.append(repository)
 
     return repositories
@@ -106,50 +113,47 @@ def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbos
     if "libraries" not in catalog:
         return libraries
 
-    for name, library in catalog["libraries"].items():
-        match library:
-            case str(declaration):
-                (module, version) = __parse_declaration(declaration)
-                library = Library(
-                    name=name,
-                    coordinates=module,
-                    version=version,
-                )
-                libraries.append(library)
-            case {"group": str(group), "name": str(library_name), "version": str(version)}:
-                library = Library(
-                    name=name,
-                    coordinates=f"{group}:{library_name}",
-                    version=version,
-                )
-                libraries.append(library)
-            case {"group": str(group), "name": str(library_name), "version": {"ref": str(ref)}}:
-                library = Library(
-                    name=name,
-                    coordinates=f"{group}:{library_name}",
-                    version=__get_version_by_reference(versions, ref, name),
-                )
-                libraries.append(library)
-            case {"module": str(module), "version": str(version)}:
-                library = Library(
-                    name=name,
-                    coordinates=module,
-                    version=version,
-                )
-                libraries.append(library)
-            case {"module": str(module), "version": {"ref": str(ref)}}:
-                library = Library(
-                    name=name,
-                    coordinates=module,
-                    version=__get_version_by_reference(versions, ref, name),
-                )
-                libraries.append(library)
-            case {"module": str(module)}:
-                if verbose:
-                    log_warning(f'Library "{module}" has no version in catalog.')
-            case _:
-                message = f"Unknown library notation: {library}"
-                raise KatalogerParseException(message)
+    for name, library_data in catalog["libraries"].items():
+        if not isinstance(name, str):
+            raise KatalogerParseException(message=f'Unexpected library name: "{name}".')
+
+        library: Library
+        if isinstance(library_data, str):
+            (module, version) = __parse_declaration(library_data)
+            library = Library(name=name, coordinates=module, version=version)
+        elif mr := match(library_data, pattern={"group": str, "name": str, "version": str}):
+            library = Library(
+                name=name,
+                coordinates=f"{mr.group}:{mr.name}",
+                version=mr.version,
+            )
+        elif mr := match(library_data, pattern={"group": str, "name": str, "version": {"ref": str}}):
+            library = Library(
+                name=name,
+                coordinates=f"{mr.group}:{mr.name}",
+                version=__get_version_by_reference(versions, mr.version.ref, name),
+            )
+        elif mr := match(library_data, pattern={"module": str, "version": str}):
+            library = Library(
+                name=name,
+                coordinates=mr.module,
+                version=mr.version,
+            )
+        elif mr := match(library_data, pattern={"module": str, "version": {"ref": str}}):
+            library = Library(
+                name=name,
+                coordinates=mr.module,
+                version=__get_version_by_reference(versions, mr.version.ref, name),
+            )
+        elif mr := match(library_data, pattern={"module": str}):
+            if verbose:
+                log_warning(f'Library "{mr.module}" has no version in catalog.')
+            continue
+        else:
+            message = f"Unknown library notation: {library_data}"
+            raise KatalogerParseException(message)
+
+        libraries.append(library)
 
     return libraries
 
@@ -159,36 +163,34 @@ def parse_plugins(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose:
     if "plugins" not in catalog:
         return plugins
 
-    for name, plugin in catalog["plugins"].items():
-        match plugin:
-            case str(declaration):
-                (plugin_id, version) = __parse_declaration(declaration)
-                plugin = Plugin(
-                    name=name,
-                    coordinates=plugin_id,
-                    version=version,
-                )
-                plugins.append(plugin)
-            case {"id": str(plugin_id), "version": str(version)}:
-                plugin = Plugin(
-                    name=name,
-                    coordinates=plugin_id,
-                    version=version,
-                )
-                plugins.append(plugin)
-            case {"id": str(plugin_id), "version": {"ref": str(ref)}}:
-                plugin = Plugin(
-                    name=name,
-                    coordinates=plugin_id,
-                    version=__get_version_by_reference(versions, ref, name),
-                )
-                plugins.append(plugin)
-            case {"id": str(plugin_id)}:
-                if verbose:
-                    log_warning(f'Plugin "{plugin_id}" has no version in catalog.')
-            case _:
-                message = f"Unknown plugin notation: {plugin}"
-                raise KatalogerParseException(message)
+    for name, plugin_data in catalog["plugins"].items():
+        if not isinstance(name, str):
+            raise KatalogerParseException(message=f'Unexpected plugin name: "{name}".')
+
+        if isinstance(plugin_data, str):
+            (plugin_id, version) = __parse_declaration(plugin_data)
+            plugin = Plugin(name=name, coordinates=plugin_id, version=version)
+        elif mr := match(plugin_data, pattern={"id": str, "version": str}):
+            plugin = Plugin(
+                name=name,
+                coordinates=mr.id,
+                version=mr.version,
+            )
+        elif mr := match(plugin_data, pattern={"id": str, "version": {"ref": str}}):
+            plugin = Plugin(
+                name=name,
+                coordinates=mr.id,
+                version=__get_version_by_reference(versions, mr.version.ref, name),
+            )
+        elif mr := match(plugin_data, pattern={"id": str}):
+            if verbose:
+                log_warning(f'Plugin "{mr.id}" has no version in catalog.')
+            continue
+        else:
+            message = f"Unknown plugin notation: {plugin_data}"
+            raise KatalogerParseException(message)
+
+        plugins.append(plugin)
 
     return plugins
 
@@ -220,12 +222,3 @@ def __extract_optional_boolean(data: Dict, key: str) -> Optional[bool]:
 
     message = f'Configuration field "{key}" has incorrect value "{value}", while expected boolean type.'
     raise KatalogerParseException(message)
-
-
-def load_toml_to_dict(path: Path) -> Dict[str, Union[Dict, str]]:
-    with Path.open(path, "rb") as file:
-        try:
-            return tomllib.load(file)
-        except tomllib.TOMLDecodeError as parse_error:
-            message = f"Can't parse TOML in \"{path.name}\"."
-            raise KatalogerParseException(message) from parse_error

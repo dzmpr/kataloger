@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import Mock
 
 import pytest
 from yarl import URL
@@ -15,7 +15,6 @@ from kataloger.helpers import toml_parse_helpers
 from kataloger.helpers.toml_parse_helpers import (
     load_catalog,
     load_configuration,
-    load_toml_to_dict,
     parse_catalogs,
     parse_libraries,
     parse_plugins,
@@ -31,35 +30,6 @@ class TestTomlParseHelpers:
     default_repository_name: str = "repository_name"
     default_repository_address: str = "https://reposito.ry/"
     default_catalog_name: str = "catalog_name"
-
-    def test_should_read_toml_file_to_dictionary_when_toml_format_is_correct(self):
-        toml: bytes = b"""\
-        [versions]
-        hilt = "2.50"
-
-        [libraries]
-        kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version = "1.9.22" }
-        """
-        expected_data: Dict = {
-            "versions": {
-                "hilt": "2.50",
-            },
-            "libraries": {
-                "kotlin-stdlib": {
-                    "module": "org.jetbrains.kotlin:kotlin-stdlib",
-                    "version": "1.9.22",
-                },
-            },
-        }
-        with patch.object(Path, "open", mock_open(read_data=toml)):
-            actual_data: Dict = load_toml_to_dict(path=Mock())
-
-        assert actual_data == expected_data
-
-    def test_should_raise_exception_when_toml_format_is_incorrect(self):
-        toml: bytes = b"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>"""
-        with patch.object(Path, "open", mock_open(read_data=toml)), pytest.raises(KatalogerParseException):
-            load_toml_to_dict(path=Mock())
 
     def test_should_return_empty_plugins_list_when_catalog_has_no_plugins(self):
         catalog: Dict = {"libraries": {}}
@@ -180,6 +150,19 @@ class TestTomlParseHelpers:
                 self.default_artifact_name: {
                     "module": self.default_plugin_id,
                     "ref": "version",
+                },
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_plugins(catalog, versions={}, verbose=False)
+
+    def test_should_raise_exception_when_plugin_name_is_not_string(self):
+        catalog: Dict = {
+            "plugins": {
+                42: {
+                    "id": self.default_plugin_id,
+                    "version": self.default_version,
                 },
             },
         }
@@ -373,16 +356,26 @@ class TestTomlParseHelpers:
         with pytest.raises(KatalogerParseException):
             parse_libraries(catalog, versions={}, verbose=False)
 
+    def test_should_raise_exception_when_library_name_is_not_string(self):
+        catalog: Dict = {
+            "libraries": {
+                42: "com.library:module:1.0.0",
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_libraries(catalog, versions={}, verbose=False)
+
     def test_should_return_none_when_there_is_no_repositories(self):
         expected_repositories: Optional[List[Repository]] = None
-        actual_repositories: Optional[List[Repository]] = parse_repositories(repositories_data=[])
+        actual_repositories: Optional[List[Repository]] = parse_repositories(data={})
 
         assert actual_repositories == expected_repositories
 
     def test_should_parse_repository_when_it_has_name_and_address(self):
-        data: List[Tuple[str, str]] = [
-            (self.default_repository_name, self.default_repository_address),
-        ]
+        data: Dict[str, str] = {
+            self.default_repository_name: self.default_repository_address,
+        }
         expected_repository: Repository = Repository(
             name=self.default_repository_name,
             address=URL(self.default_repository_address),
@@ -396,15 +389,13 @@ class TestTomlParseHelpers:
     def test_should_parse_repository_when_it_has_name_address_user_and_password(self):
         repository_user: str = "username"
         repository_password: str = "password"
-        data: List[Tuple] = [
-            (
-                self.default_repository_name, {
-                    "address": self.default_repository_address,
-                    "user": repository_user,
-                    "password": repository_password,
-                },
-            ),
-        ]
+        data: Dict[str, Dict] = {
+            self.default_repository_name: {
+                "address": self.default_repository_address,
+                "user": repository_user,
+                "password": repository_password,
+            },
+        }
         expected_repository: Repository = Repository(
             name=self.default_repository_name,
             address=URL(self.default_repository_address),
@@ -415,28 +406,43 @@ class TestTomlParseHelpers:
 
         assert actual_repositories == [expected_repository]
 
-    def test_should_raise_exception_when_there_is_no_repository_user_but_password_present(self):
-        data: List[Tuple] = [
-            (
-                self.default_repository_name, {
-                    "address": self.default_repository_address,
-                    "user": "username",
-                },
-            ),
-        ]
+    def test_should_raise_exception_when_repository_name_is_not_string(self):
+        data: Dict = {
+            42: self.default_repository_address,
+        }
 
         with pytest.raises(KatalogerParseException):
             parse_repositories(data)
 
-    def test_should_raise_exception_when_there_is_no_repository_password_but_user_present(self):
-        data: List[Tuple] = [
-            (
-                self.default_repository_name, {
-                    "address": self.default_repository_address,
-                    "password": "password",
-                },
-            ),
-        ]
+    def test_should_raise_exception_when_there_is_no_repository_password_but_address_and_user_present(self):
+        data: Dict[str, Dict] = {
+            self.default_repository_name: {
+                "address": self.default_repository_address,
+                "user": "username",
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_repositories(data)
+
+    def test_should_raise_exception_when_there_is_no_repository_user_but_address_and_password_present(self):
+        data: Dict[str, Dict] = {
+            self.default_repository_name: {
+                "address": self.default_repository_address,
+                "password": "password",
+            },
+        }
+
+        with pytest.raises(KatalogerParseException):
+            parse_repositories(data)
+
+    def test_should_raise_exception_when_there_is_no_repository_address_but_user_and_password_present(self):
+        data: Dict[str, Dict] = {
+            self.default_repository_name: {
+                "user": "username",
+                "password": "password",
+            },
+        }
 
         with pytest.raises(KatalogerParseException):
             parse_repositories(data)
@@ -445,6 +451,7 @@ class TestTomlParseHelpers:
         data: List[Tuple] = [("repository_name", "repository_address", "repository_port")]
 
         with pytest.raises(KatalogerParseException):
+            # noinspection PyTypeChecker
             parse_repositories(data)
 
     def test_should_return_none_when_there_is_no_catalogs(self):
@@ -550,7 +557,7 @@ class TestTomlParseHelpers:
             version=self.default_version,
         )
 
-        toml_parse_helpers.load_toml_to_dict = Mock(return_value=catalog)
+        toml_parse_helpers.load_toml = Mock(return_value=catalog)
         actual_libraries, actual_plugins = load_catalog(catalog_path=Mock(), verbose=False)
 
         assert actual_libraries == [expected_library]
@@ -671,7 +678,7 @@ class TestTomlParseHelpers:
         configuration_data: Dict = {
             "verbose": 1,
         }
-        toml_parse_helpers.load_toml_to_dict = Mock(return_value=configuration_data)
+        toml_parse_helpers.load_toml = Mock(return_value=configuration_data)
 
         with pytest.raises(KatalogerParseException):
             load_configuration(configuration_path=Mock())
@@ -694,7 +701,7 @@ class TestTomlParseHelpers:
             suggest_unstable_updates=expected_suggest_unstable_updates,
             fail_on_updates=expected_fail_on_updates,
         )
-        toml_parse_helpers.load_toml_to_dict = Mock(return_value=configuration_data)
+        toml_parse_helpers.load_toml = Mock(return_value=configuration_data)
         actual_configuration: ConfigurationData = load_configuration(configuration_path=Mock())
 
         assert actual_configuration == expected_configuration

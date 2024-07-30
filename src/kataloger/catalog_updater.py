@@ -100,12 +100,14 @@ class CatalogUpdater:
     ) -> Optional[ArtifactUpdate]:
         for resolver in self.update_resolvers:
             (resolution, optional_update) = resolver.resolve(artifact, repositories_metadata)
-            match resolution:
-                case UpdateResolution.CANT_RESOLVE:
-                    continue
-                case UpdateResolution.UPDATE_FOUND:
-                    return optional_update
-                case UpdateResolution.NO_UPDATES:
-                    return None
+            if resolution == UpdateResolution.CANT_RESOLVE:
+                continue
+            if resolution == UpdateResolution.UPDATE_FOUND:
+                return optional_update
+            if resolution == UpdateResolution.NO_UPDATES:
+                return None
+
+            message: str = f'Unexpected update resolution: "{resolution}".'
+            raise ValueError(message)
 
         return None
