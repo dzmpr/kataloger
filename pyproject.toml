@@ -45,7 +45,8 @@ kataloger = "kataloger.__main__:main"
 "Changelog" = "https://github.com/dzmpr/kataloger/releases"
 
 [tool.pytest.ini_options]
-pythonpath = "src/"
+pythonpath = "src"
+testpaths = "tests"
 
 [tool.ruff]
 line-length = 120
