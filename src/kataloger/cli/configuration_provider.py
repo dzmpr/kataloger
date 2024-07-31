@@ -114,6 +114,9 @@ def load_configuration_data(configuration_path: Optional[Path]) -> Configuration
         if file_exists(configuration_candidate):
             configuration_path = configuration_candidate
         else:
-            configuration_path = get_package_file("default.configuration.toml")
-
+            configuration_path = get_package_file("defaults.configuration.toml")
+            if not file_exists(configuration_path):
+                message: str = ("Can't find default configuration file. "
+                                "Please specify configuration file with -c [PATH] argument.")
+                raise KatalogerConfigurationException(message)
     return load_configuration(configuration_path)
