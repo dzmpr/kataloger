@@ -1,3 +1,3 @@
 ### Changelog
 
-* Fix: Default configuration file now correctly shipped.
+* Support library notation with group and name but without version.

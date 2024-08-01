@@ -121,16 +121,26 @@ def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbos
         if isinstance(library_data, str):
             (module, version) = __parse_declaration(library_data)
             library = Library(name=name, coordinates=module, version=version)
+        elif mr := match(library_data, pattern={"group": str, "name": str, "version": {"ref": str}}):
+            library = Library(
+                name=name,
+                coordinates=f"{mr.group}:{mr.name}",
+                version=__get_version_by_reference(versions, mr.version.ref, name),
+            )
         elif mr := match(library_data, pattern={"group": str, "name": str, "version": str}):
             library = Library(
                 name=name,
                 coordinates=f"{mr.group}:{mr.name}",
                 version=mr.version,
             )
-        elif mr := match(library_data, pattern={"group": str, "name": str, "version": {"ref": str}}):
+        elif mr := match(library_data, pattern={"group": str, "name": str}):
+            if verbose:
+                log_warning(f'Library "{mr.module}" has no version in catalog.')
+            continue
+        elif mr := match(library_data, pattern={"module": str, "version": {"ref": str}}):
             library = Library(
                 name=name,
-                coordinates=f"{mr.group}:{mr.name}",
+                coordinates=mr.module,
                 version=__get_version_by_reference(versions, mr.version.ref, name),
             )
         elif mr := match(library_data, pattern={"module": str, "version": str}):
@@ -138,12 +148,6 @@ def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbos
                 name=name,
                 coordinates=mr.module,
                 version=mr.version,
-            )
-        elif mr := match(library_data, pattern={"module": str, "version": {"ref": str}}):
-            library = Library(
-                name=name,
-                coordinates=mr.module,
-                version=__get_version_by_reference(versions, mr.version.ref, name),
             )
         elif mr := match(library_data, pattern={"module": str}):
             if verbose:

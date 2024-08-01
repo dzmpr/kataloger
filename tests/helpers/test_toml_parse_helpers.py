@@ -276,6 +276,21 @@ class TestTomlParseHelpers:
 
         assert actual_libraries == [expected_library]
 
+    def test_should_not_raise_exception_when_library_has_group_and_name_but_has_no_version(self):
+        library_group: str = "com.library.group"
+        library_name: str = "library-name"
+        catalog: Dict = {
+            "libraries": {
+                self.default_artifact_name: {
+                    "group": library_group,
+                    "name": library_name,
+                },
+            },
+        }
+        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+
+        assert not actual_libraries
+
     def test_should_raise_exception_when_there_is_library_group_and_name_but_no_version_by_reference(self):
         library_group: str = "com.library.group"
         library_name: str = "library-name"
@@ -329,6 +344,16 @@ class TestTomlParseHelpers:
         actual_libraries: List[Library] = parse_libraries(catalog, versions, verbose=False)
 
         assert actual_libraries == [expected_library]
+
+    def test_should_not_raise_exception_when_library_has_module_but_has_no_version(self):
+        catalog: Dict = {
+            "libraries": {
+                self.default_artifact_name: {"module": self.default_library_module},
+            },
+        }
+        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+
+        assert not actual_libraries
 
     def test_should_raise_exception_when_there_is_library_module_but_no_version_by_reference(self):
         catalog: Dict = {

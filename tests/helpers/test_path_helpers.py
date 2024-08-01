@@ -59,5 +59,3 @@ class TestPathHelpers:
     def test_should_return_false_when_path_not_exists(self, tmp_path: Path):
         path: Path = tmp_path / "non_existing_directory"
         assert not file_exists(path)
-
-
