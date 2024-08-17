@@ -1,9 +1,8 @@
 from argparse import ArgumentParser
-from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import List, Optional
 
-from kataloger import package_name
+from kataloger import __version__ as package_version
 from kataloger.data.catalog import Catalog
 from kataloger.data.configuration_data import ConfigurationData
 from kataloger.data.kataloger_arguments import KatalogerArguments
@@ -56,7 +55,7 @@ def parse_arguments(*args: str) -> KatalogerArguments:
     parser.add_argument(
         "--version",
         action="version",
-        version=f"%(prog)s {_get_kataloger_version()}",
+        version=f"%(prog)s {package_version}",
     )
     arguments = parser.parse_args(args)
 
@@ -71,16 +70,6 @@ def parse_arguments(*args: str) -> KatalogerArguments:
             fail_on_updates=arguments.fail_on_updates,
         ),
     )
-
-
-def _get_kataloger_version() -> str:
-    if __name__ == "__main__":
-        return "indev"
-
-    try:
-        return version(package_name)
-    except PackageNotFoundError:
-        return "unknown"
 
 
 def _get_catalogs(path_strings: List[str]) -> Optional[List[Catalog]]:

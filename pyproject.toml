@@ -4,19 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kataloger"
-version = "0.3.2"
-dependencies = [
-    "aiohttp",
-    "yarl",
-    "xmltodict",
-    "tomli; python_version < \"3.11\"",
-    "importlib-resources; python_version < \"3.9\""
-]
+dynamic = ["version", "dependencies", "readme"]
 authors = [
     { name = "Dzmitry Pryskoka", email = "mr.priskoka@yandex.com" },
 ]
 description = "CLI tool for projects that uses gradle version catalog to check dependency updates."
-readme = "README.md"
 license = { text = "Apache 2.0" }
 requires-python = ">=3.8"
 classifiers = [
@@ -30,6 +22,13 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
+[project.scripts]
+kataloger = "kataloger.__main__:main"
+
+[project.urls]
+"GitHub" = "https://github.com/dzmpr/kataloger"
+"Changelog" = "https://github.com/dzmpr/kataloger/releases"
+
 [tool.setuptools.packages.find]
 namespaces = false
 where = ["src"]
@@ -37,12 +36,10 @@ where = ["src"]
 [tool.setuptools.package-data]
 kataloger = ["default.configuration.toml"]
 
-[project.scripts]
-kataloger = "kataloger.__main__:main"
-
-[project.urls]
-"GitHub" = "https://github.com/dzmpr/kataloger"
-"Changelog" = "https://github.com/dzmpr/kataloger/releases"
+[tool.setuptools.dynamic]
+version = { attr = "kataloger.__version__" }
+dependencies = { file = "requirements.txt" }
+readme = { file = "README.md" }
 
 [tool.pytest.ini_options]
 pythonpath = "src"
