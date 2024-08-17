@@ -52,7 +52,7 @@ jobs:
         fi
         echo "::set-output name=package_version::$version"
 
-    - uses: softprops/action-gh-release@v1
+    - uses: softprops/action-gh-release@v2
       name: Create release
       with:
         body_path: ${{ github.workspace }}/changelog.md
