@@ -1,6 +1,6 @@
 ## Kataloger
 
-[![Python version](https://img.shields.io/badge/python-3.8-blue.svg)](https://pypi.python.org/pypi/kataloger)
+[![Python version](https://img.shields.io/badge/python-3.8_--_3.13-blue.svg?logo=python&logoColor=white)](https://pypi.python.org/pypi/kataloger)
 [![Latest version](https://img.shields.io/pypi/v/kataloger.svg?style=flat&label=Latest&color=%234B78E6&logo=&logoColor=white)](https://pypi.python.org/pypi/kataloger)
 [![Downloads](https://static.pepy.tech/badge/kataloger/month)](https://pepy.tech/project/kataloger)
 [![Tests](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml)
