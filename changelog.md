@@ -1,3 +1,3 @@
 ### Changelog
 
-* Support library notation with group and name but without version.
+* Catalog search now includes the `gradle` subdirectory.

@@ -1,4 +1,5 @@
 import sys
+from itertools import chain
 from pathlib import Path
 from typing import List, Optional, Tuple, TypeVar
 
@@ -100,7 +101,7 @@ def get_repositories(
 
 
 def find_cwd_catalogs() -> Optional[List[Catalog]]:
-    catalog_files = Path.cwd().glob("*.versions.toml")
+    catalog_files = chain(Path.cwd().glob("*.versions.toml"), Path.cwd().glob("gradle/*.versions.toml"))
     catalog_paths = filter(file_exists, catalog_files)
     if not catalog_paths:
         return None

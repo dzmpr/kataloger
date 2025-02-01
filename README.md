@@ -46,7 +46,9 @@ And then you need specify only path to configuration:
 kataloger -c ~/ProjectDir/project.configuration.toml
 ```
 
-Or you can omit all parameters if configuration file or catalogs are located in current working directory. In this mode kataloger trying to find all catalogs (files with `.versions.toml` extension) and configuration in `default.configuration.toml` file in current directory:
+Or you can omit all parameters, then kataloger employs following logic to run:
+* `default.configuration.toml` file in current working directory will be used as configuration file.
+*  Any file with `.versions.toml` extension found in the current directory or the `gradle` subdirectory (if it exists) is considered a catalog.
 
 ```commandline
 cd ~/ProjectDir
