@@ -73,7 +73,7 @@ class CatalogUpdater:
             repositories=self.library_repositories,
             verbose=self.verbose,
         )
-        for (artifact, repositories_metadata) in library_update_info.items():
+        for artifact, repositories_metadata in library_update_info.items():
             library_updates.append(self.try_find_update(artifact, repositories_metadata))
         return list(filter(lambda item: item is not None, library_updates))
 
@@ -89,7 +89,7 @@ class CatalogUpdater:
             repositories=self.plugin_repositories,
             verbose=self.verbose,
         )
-        for (artifact, repositories_metadata) in plugin_update_info.items():
+        for artifact, repositories_metadata in plugin_update_info.items():
             plugin_updates.append(self.try_find_update(artifact, repositories_metadata))
         return list(filter(lambda item: item is not None, plugin_updates))
 

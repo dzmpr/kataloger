@@ -336,8 +336,10 @@ class TestCatalogUpdater:
         )
 
         load_metadata_mock = AsyncMock(return_value={Mock(): Mock()})
-        with patch(target="kataloger.catalog_updater.load_catalog", new=Mock(return_value=([library], [plugin]))), \
-             patch(target="kataloger.catalog_updater.get_all_artifact_metadata", new=load_metadata_mock):
+        with (
+            patch(target="kataloger.catalog_updater.load_catalog", new=Mock(return_value=([library], [plugin]))),
+            patch(target="kataloger.catalog_updater.get_all_artifact_metadata", new=load_metadata_mock),
+        ):
             artifact_updates: List[ArtifactUpdate] = await catalog_updater.get_catalog_updates(catalog_path=Mock())
 
         assert artifact_updates == [library_update, plugin_update]

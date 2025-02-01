@@ -17,14 +17,16 @@ def parse_arguments(*args: str) -> KatalogerArguments:
         epilog="Visit project repository to get more information.",
     )
     parser.add_argument(
-        "-p", "--path",
+        "-p",
+        "--path",
         action="append",
         dest="paths",
         help="Path(s) to gradle version catalog. If catalog path not provided script looking for "
              "version catalogs in current directory.",
     )
     parser.add_argument(
-        "-c", "--configuration",
+        "-c",
+        "--configuration",
         type=str,
         dest="configuration_path",
         metavar="path",
@@ -32,21 +34,24 @@ def parse_arguments(*args: str) -> KatalogerArguments:
              "default.configuration.toml file in current directory.",
     )
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         default=None,
         dest="verbose",
         help="Enables detailed output.",
     )
     parser.add_argument(
-        "-u", "--suggest-unstable",
+        "-u",
+        "--suggest-unstable",
         action="store_true",
         default=None,
         dest="suggest_unstable_updates",
         help="Allow %(prog)s suggest update from stable version to unstable.",
     )
     parser.add_argument(
-        "-f", "--fail-on-updates",
+        "-f",
+        "--fail-on-updates",
         action="store_true",
         default=None,
         dest="fail_on_updates",

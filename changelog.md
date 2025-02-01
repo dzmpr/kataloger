@@ -1,3 +1,3 @@
 ### Changelog
 
-* Catalog search now includes the `gradle` subdirectory.
+* Drop python 3.8 support.

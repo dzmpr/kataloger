@@ -2,28 +2,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Union
 
-from kataloger import package_name
 from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
-
-
-def remove_suffix(string: str, suffix: str) -> str:
-    if sys.version_info < (3, 9):
-        if suffix and string.endswith(suffix):
-            return string[:-len(suffix)]
-
-        return string
-
-    return string.removesuffix(suffix)
-
-
-def get_package_file(filename: str) -> Path:
-    if sys.version_info < (3, 9):
-        from importlib_resources import as_file, files
-    else:
-        from importlib.resources import as_file, files
-
-    with as_file(files(package_name).joinpath(filename)) as path:
-        return path
 
 
 def load_toml(path: Path) -> Dict[str, Union[str, Dict]]:

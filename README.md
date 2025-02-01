@@ -1,6 +1,6 @@
 ## Kataloger
 
-[![Python version](https://img.shields.io/badge/python-3.8_--_3.13-blue.svg?logo=python&logoColor=white)](https://pypi.python.org/pypi/kataloger)
+[![Python version](https://img.shields.io/badge/python-3.9_--_3.13-blue.svg?logo=python&logoColor=white)](https://pypi.python.org/pypi/kataloger)
 [![Latest version](https://img.shields.io/pypi/v/kataloger.svg?style=flat&label=Latest&color=%234B78E6&logo=&logoColor=white)](https://pypi.python.org/pypi/kataloger)
 [![Downloads](https://static.pepy.tech/badge/kataloger/month)](https://pepy.tech/project/kataloger)
 [![Tests](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/dzmpr/kataloger/actions/workflows/run-tests.yml)
@@ -71,7 +71,7 @@ kataloger -p ~/ProjectDir/libs.versions.toml
 
 ### Installation
 
-Kataloger available in Python Package Index (PyPI). You can install kataloger using pip (requires python 3.8 and greater):
+Kataloger available in Python Package Index (PyPI). You can install kataloger using pip (requires python 3.9 and greater):
 ```commandline
 pip install kataloger
 ```

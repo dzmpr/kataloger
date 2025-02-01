@@ -1,6 +1,8 @@
+from importlib.resources import as_file, files
 from pathlib import Path
 from typing import Optional
 
+from kataloger import package_name
 from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
 
 
@@ -32,3 +34,14 @@ def file_exists(path: Path) -> bool:
     :returns: True if the path exists and is a file, False otherwise.
     """
     return path.exists() and path.is_file()
+
+
+def get_package_file(filename: str) -> Path:
+    """
+    Returns the absolute path to a file inside the installed package.
+
+    :param filename: The file name within the package.
+    :returns: The absolute path to the file.
+    """
+    with as_file(files(package_name).joinpath(filename)) as path:
+        return path
