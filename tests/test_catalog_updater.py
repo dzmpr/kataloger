@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
@@ -84,7 +84,7 @@ class TestCatalogUpdater:
     def test_try_find_update_should_return_update_when_first_resolver_cant_resolve_update_but_second_does(self):
         library: Library = EntityFactory.create_library()
         repository: Repository = EntityFactory.create_repository()
-        metadata_mock: List[Mock] = [Mock()]
+        metadata_mock: list[Mock] = [Mock()]
         expected_update: ArtifactUpdate = EntityFactory.create_artifact_update(
             name=library.name,
             update_repository_name=repository.name,
@@ -114,7 +114,7 @@ class TestCatalogUpdater:
             plugin_repositories=[repository],
             update_resolvers=[resolver_mock],
         )
-        actual_updates: List[ArtifactUpdate] = await catalog_updater.get_library_updates(libraries=[library])
+        actual_updates: list[ArtifactUpdate] = await catalog_updater.get_library_updates(libraries=[library])
 
         assert actual_updates == []
         resolver_mock.resolve.assert_not_called()
@@ -142,7 +142,7 @@ class TestCatalogUpdater:
             target="kataloger.catalog_updater.get_all_artifact_metadata",
             new=AsyncMock(return_value=repositories_metadata),
         ) as load_metadata_mock:
-            actual_updates: List[ArtifactUpdate] = await catalog_updater.get_library_updates(libraries)
+            actual_updates: list[ArtifactUpdate] = await catalog_updater.get_library_updates(libraries)
 
         assert actual_updates == [expected_update]
         assert resolver_mock.resolve.call_count == 2
@@ -161,7 +161,7 @@ class TestCatalogUpdater:
             library_repositories=[repository],
             update_resolvers=[resolver_mock],
         )
-        actual_updates: List[ArtifactUpdate] = await catalog_updater.get_plugin_updates(plugins=[plugin])
+        actual_updates: list[ArtifactUpdate] = await catalog_updater.get_plugin_updates(plugins=[plugin])
 
         assert actual_updates == []
         resolver_mock.resolve.assert_not_called()
@@ -189,7 +189,7 @@ class TestCatalogUpdater:
             target="kataloger.catalog_updater.get_all_artifact_metadata",
             new=AsyncMock(return_value=repositories_metadata),
         ) as load_metadata_mock:
-            actual_updates: List[ArtifactUpdate] = await catalog_updater.get_plugin_updates(plugins)
+            actual_updates: list[ArtifactUpdate] = await catalog_updater.get_plugin_updates(plugins)
 
         assert actual_updates == [expected_update]
         assert resolver_mock.resolve.call_count == 2
@@ -276,7 +276,7 @@ class TestCatalogUpdater:
             target="kataloger.catalog_updater.get_all_artifact_metadata",
             new=AsyncMock(return_value={Mock(): Mock()}),
         ) as load_metadata_mock:
-            artifact_updates: List[ArtifactUpdate] = await catalog_updater.get_artifact_updates(
+            artifact_updates: list[ArtifactUpdate] = await catalog_updater.get_artifact_updates(
                 artifacts=[library, plugin],
             )
 
@@ -298,7 +298,7 @@ class TestCatalogUpdater:
 
     @pytest.mark.asyncio
     async def test_should_return_empty_list_when_there_are_no_libraries_and_plugins_in_loaded_catalog(self):
-        expected_updates: List[ArtifactUpdate] = []
+        expected_updates: list[ArtifactUpdate] = []
         repository: Repository = EntityFactory.create_repository()
         catalog_updater: CatalogUpdater = self._create_catalog_updater(
             library_repositories=[repository],
@@ -306,7 +306,7 @@ class TestCatalogUpdater:
             update_resolvers=[Mock()],
         )
         with patch("kataloger.catalog_updater.load_catalog", Mock(return_value=([], []))):
-            actual_updates: List[ArtifactUpdate] = await catalog_updater.get_catalog_updates(catalog_path=Mock())
+            actual_updates: list[ArtifactUpdate] = await catalog_updater.get_catalog_updates(catalog_path=Mock())
 
         assert actual_updates == expected_updates
 
@@ -340,7 +340,7 @@ class TestCatalogUpdater:
             patch(target="kataloger.catalog_updater.load_catalog", new=Mock(return_value=([library], [plugin]))),
             patch(target="kataloger.catalog_updater.get_all_artifact_metadata", new=load_metadata_mock),
         ):
-            artifact_updates: List[ArtifactUpdate] = await catalog_updater.get_catalog_updates(catalog_path=Mock())
+            artifact_updates: list[ArtifactUpdate] = await catalog_updater.get_catalog_updates(catalog_path=Mock())
 
         assert artifact_updates == [library_update, plugin_update]
         assert resolver_mock.resolve.call_count == 2
@@ -366,9 +366,9 @@ class TestCatalogUpdater:
 
     @staticmethod
     def _create_catalog_updater(
-        library_repositories: Optional[List[Repository]] = None,
-        plugin_repositories: Optional[List[Repository]] = None,
-        update_resolvers: Optional[List[UpdateResolver]] = None,
+        library_repositories: Optional[list[Repository]] = None,
+        plugin_repositories: Optional[list[Repository]] = None,
+        update_resolvers: Optional[list[UpdateResolver]] = None,
         verbose: bool = False,
     ) -> CatalogUpdater:
         if not library_repositories:

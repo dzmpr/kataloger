@@ -1,10 +1,8 @@
-from typing import List
-
 from kataloger.data.artifact_update import ArtifactUpdate
 
 
 def print_catalog_updates(
-    updates: List[ArtifactUpdate],
+    updates: list[ArtifactUpdate],
     catalog_name: str,
     catalog_count: int,
     verbose: bool,

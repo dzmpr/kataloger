@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from kataloger.data.artifact.artifact import Artifact
 from kataloger.data.artifact_update import ArtifactUpdate
@@ -13,6 +13,6 @@ class UpdateResolver(ABC):
     def resolve(
         self,
         artifact: Artifact,
-        repositories_metadata: List[MetadataRepositoryInfo],
-    ) -> Tuple[UpdateResolution, Optional[ArtifactUpdate]]:
+        repositories_metadata: list[MetadataRepositoryInfo],
+    ) -> tuple[UpdateResolution, Optional[ArtifactUpdate]]:
         raise NotImplementedError

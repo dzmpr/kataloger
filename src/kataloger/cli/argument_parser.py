@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from kataloger import __version__ as package_version
 from kataloger.data.catalog import Catalog
@@ -77,7 +77,7 @@ def parse_arguments(*args: str) -> KatalogerArguments:
     )
 
 
-def _get_catalogs(path_strings: List[str]) -> Optional[List[Catalog]]:
+def _get_catalogs(path_strings: list[str]) -> Optional[list[Catalog]]:
     if path_strings:
         return [Catalog.from_path(str_to_path(path_string=path_str, root_path=Path.cwd())) for path_str in path_strings]
 

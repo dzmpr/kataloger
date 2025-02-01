@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 from unittest.mock import Mock
 
 import pytest
@@ -32,14 +32,14 @@ class TestTomlParseHelpers:
     default_catalog_name: str = "catalog_name"
 
     def test_should_return_empty_plugins_list_when_catalog_has_no_plugins(self):
-        catalog: Dict = {"libraries": {}}
-        expected_plugins: List[Plugin] = []
-        actual_plugins: List[Plugin] = parse_plugins(catalog, versions={}, verbose=False)
+        catalog: dict = {"libraries": {}}
+        expected_plugins: list[Plugin] = []
+        actual_plugins: list[Plugin] = parse_plugins(catalog, versions={}, verbose=False)
 
         assert actual_plugins == expected_plugins
 
     def test_should_parse_plugin_when_it_has_declaration(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: f"{self.default_plugin_id}:{self.default_version}",
             },
@@ -49,12 +49,12 @@ class TestTomlParseHelpers:
             coordinates=self.default_plugin_id,
             version=self.default_version,
         )
-        actual_plugins: List[Plugin] = parse_plugins(catalog, versions={}, verbose=False)
+        actual_plugins: list[Plugin] = parse_plugins(catalog, versions={}, verbose=False)
 
         assert actual_plugins == [expected_plugin]
 
     def test_should_raise_exception_when_plugin_declaration_has_no_version(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: f"{self.default_plugin_id}:",
             },
@@ -64,7 +64,7 @@ class TestTomlParseHelpers:
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_declaration_has_no_coordinates(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: f":{self.default_version}",
             },
@@ -74,7 +74,7 @@ class TestTomlParseHelpers:
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_declaration_has_no_colon_delimiter(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: "com.plugin.module.1.0.0",
             },
@@ -84,7 +84,7 @@ class TestTomlParseHelpers:
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_declaration_is_empty(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: "",
             },
@@ -94,7 +94,7 @@ class TestTomlParseHelpers:
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_parse_plugin_when_it_has_id_and_version(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: {
                     "id": self.default_plugin_id,
@@ -107,13 +107,13 @@ class TestTomlParseHelpers:
             coordinates=self.default_plugin_id,
             version=self.default_version,
         )
-        actual_plugins: List[Plugin] = parse_plugins(catalog, versions={}, verbose=False)
+        actual_plugins: list[Plugin] = parse_plugins(catalog, versions={}, verbose=False)
 
         assert actual_plugins == [expected_plugin]
 
     def test_should_parse_plugin_when_it_has_id_and_reference_to_version(self):
         version_reference: str = f"{self.default_artifact_name}.version"
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: {
                     "id": self.default_plugin_id,
@@ -121,18 +121,18 @@ class TestTomlParseHelpers:
                 },
             },
         }
-        versions: Dict[str, str] = {version_reference: self.default_version}
+        versions: dict[str, str] = {version_reference: self.default_version}
         expected_plugin: Plugin = Plugin(
             name=self.default_artifact_name,
             coordinates=self.default_plugin_id,
             version=self.default_version,
         )
-        actual_plugins: List[Plugin] = parse_plugins(catalog, versions, verbose=False)
+        actual_plugins: list[Plugin] = parse_plugins(catalog, versions, verbose=False)
 
         assert actual_plugins == [expected_plugin]
 
     def test_should_raise_exception_when_there_is_no_plugin_version_by_reference(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: {
                     "id": self.default_plugin_id,
@@ -145,7 +145,7 @@ class TestTomlParseHelpers:
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_structure_is_incorrect(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 self.default_artifact_name: {
                     "module": self.default_plugin_id,
@@ -158,7 +158,7 @@ class TestTomlParseHelpers:
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_name_is_not_string(self):
-        catalog: Dict = {
+        catalog: dict = {
             "plugins": {
                 42: {
                     "id": self.default_plugin_id,
@@ -171,14 +171,14 @@ class TestTomlParseHelpers:
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_return_empty_libraries_list_when_catalog_has_no_libraries(self):
-        catalog: Dict = {"plugins": {}}
-        expected_libraries: List[Library] = []
-        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+        catalog: dict = {"plugins": {}}
+        expected_libraries: list[Library] = []
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
 
         assert actual_libraries == expected_libraries
 
     def test_should_parse_library_when_it_has_declaration(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: f"{self.default_library_module}:{self.default_version}",
             },
@@ -188,12 +188,12 @@ class TestTomlParseHelpers:
             coordinates=self.default_library_module,
             version=self.default_version,
         )
-        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
 
         assert actual_libraries == [expected_library]
 
     def test_should_raise_exception_when_library_declaration_has_no_version(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: f"{self.default_library_module}:",
             },
@@ -203,7 +203,7 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_declaration_has_no_coordinates(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: f":{self.default_version}",
             },
@@ -213,7 +213,7 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_declaration_has_no_colon_delimiter(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: "com.library.module.1.0.0",
             },
@@ -223,7 +223,7 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_declaration_is_empty(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: "",
             },
@@ -235,7 +235,7 @@ class TestTomlParseHelpers:
     def test_should_parse_library_when_it_has_group_name_and_version(self):
         library_group: str = "com.library.group"
         library_name: str = "library-name"
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "group": library_group,
@@ -249,7 +249,7 @@ class TestTomlParseHelpers:
             coordinates=f"{library_group}:{library_name}",
             version=self.default_version,
         )
-        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
 
         assert actual_libraries == [expected_library]
 
@@ -257,7 +257,7 @@ class TestTomlParseHelpers:
         library_group: str = "com.library.group"
         library_name: str = "library-name"
         version_reference: str = f"{self.default_artifact_name}.version"
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "group": library_group,
@@ -266,20 +266,20 @@ class TestTomlParseHelpers:
                 },
             },
         }
-        versions: Dict[str, str] = {version_reference: self.default_version}
+        versions: dict[str, str] = {version_reference: self.default_version}
         expected_library: Library = Library(
             name=self.default_artifact_name,
             coordinates=f"{library_group}:{library_name}",
             version=self.default_version,
         )
-        actual_libraries: List[Library] = parse_libraries(catalog, versions, verbose=False)
+        actual_libraries: list[Library] = parse_libraries(catalog, versions, verbose=False)
 
         assert actual_libraries == [expected_library]
 
     def test_should_not_raise_exception_when_library_has_group_and_name_but_has_no_version(self):
         library_group: str = "com.library.group"
         library_name: str = "library-name"
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "group": library_group,
@@ -287,14 +287,14 @@ class TestTomlParseHelpers:
                 },
             },
         }
-        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
 
         assert not actual_libraries
 
     def test_should_raise_exception_when_there_is_library_group_and_name_but_no_version_by_reference(self):
         library_group: str = "com.library.group"
         library_name: str = "library-name"
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "group": library_group,
@@ -308,7 +308,7 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_parse_library_when_it_has_module_and_version(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "module": self.default_library_module,
@@ -321,13 +321,13 @@ class TestTomlParseHelpers:
             coordinates=self.default_library_module,
             version=self.default_version,
         )
-        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
 
         assert actual_libraries == [expected_library]
 
     def test_should_parse_library_when_it_has_module_and_reference_to_version(self):
         version_reference: str = f"{self.default_artifact_name}.version"
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "module": self.default_library_module,
@@ -335,28 +335,28 @@ class TestTomlParseHelpers:
                 },
             },
         }
-        versions: Dict[str, str] = {version_reference: self.default_version}
+        versions: dict[str, str] = {version_reference: self.default_version}
         expected_library: Library = Library(
             name=self.default_artifact_name,
             coordinates=self.default_library_module,
             version=self.default_version,
         )
-        actual_libraries: List[Library] = parse_libraries(catalog, versions, verbose=False)
+        actual_libraries: list[Library] = parse_libraries(catalog, versions, verbose=False)
 
         assert actual_libraries == [expected_library]
 
     def test_should_not_raise_exception_when_library_has_module_but_has_no_version(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {"module": self.default_library_module},
             },
         }
-        actual_libraries: List[Library] = parse_libraries(catalog, versions={}, verbose=False)
+        actual_libraries: list[Library] = parse_libraries(catalog, versions={}, verbose=False)
 
         assert not actual_libraries
 
     def test_should_raise_exception_when_there_is_library_module_but_no_version_by_reference(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "module": self.default_library_module,
@@ -369,7 +369,7 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_structure_is_incorrect(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 self.default_artifact_name: {
                     "id": self.default_library_module,
@@ -382,7 +382,7 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_name_is_not_string(self):
-        catalog: Dict = {
+        catalog: dict = {
             "libraries": {
                 42: "com.library:module:1.0.0",
             },
@@ -392,13 +392,13 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_return_none_when_there_is_no_repositories(self):
-        expected_repositories: Optional[List[Repository]] = None
-        actual_repositories: Optional[List[Repository]] = parse_repositories(data={})
+        expected_repositories: Optional[list[Repository]] = None
+        actual_repositories: Optional[list[Repository]] = parse_repositories(data={})
 
         assert actual_repositories == expected_repositories
 
     def test_should_parse_repository_when_it_has_name_and_address(self):
-        data: Dict[str, str] = {
+        data: dict[str, str] = {
             self.default_repository_name: self.default_repository_address,
         }
         expected_repository: Repository = Repository(
@@ -407,14 +407,14 @@ class TestTomlParseHelpers:
             user=None,
             password=None,
         )
-        actual_repositories: List[Repository] = parse_repositories(data)
+        actual_repositories: list[Repository] = parse_repositories(data)
 
         assert actual_repositories == [expected_repository]
 
     def test_should_parse_repository_when_it_has_name_address_user_and_password(self):
         repository_user: str = "username"
         repository_password: str = "password"
-        data: Dict[str, Dict] = {
+        data: dict[str, dict] = {
             self.default_repository_name: {
                 "address": self.default_repository_address,
                 "user": repository_user,
@@ -427,12 +427,12 @@ class TestTomlParseHelpers:
             user=repository_user,
             password=repository_password,
         )
-        actual_repositories: List[Repository] = parse_repositories(data)
+        actual_repositories: list[Repository] = parse_repositories(data)
 
         assert actual_repositories == [expected_repository]
 
     def test_should_raise_exception_when_repository_name_is_not_string(self):
-        data: Dict = {
+        data: dict = {
             42: self.default_repository_address,
         }
 
@@ -440,7 +440,7 @@ class TestTomlParseHelpers:
             parse_repositories(data)
 
     def test_should_raise_exception_when_there_is_no_repository_password_but_address_and_user_present(self):
-        data: Dict[str, Dict] = {
+        data: dict[str, dict] = {
             self.default_repository_name: {
                 "address": self.default_repository_address,
                 "user": "username",
@@ -451,7 +451,7 @@ class TestTomlParseHelpers:
             parse_repositories(data)
 
     def test_should_raise_exception_when_there_is_no_repository_user_but_address_and_password_present(self):
-        data: Dict[str, Dict] = {
+        data: dict[str, dict] = {
             self.default_repository_name: {
                 "address": self.default_repository_address,
                 "password": "password",
@@ -462,7 +462,7 @@ class TestTomlParseHelpers:
             parse_repositories(data)
 
     def test_should_raise_exception_when_there_is_no_repository_address_but_user_and_password_present(self):
-        data: Dict[str, Dict] = {
+        data: dict[str, dict] = {
             self.default_repository_name: {
                 "user": "username",
                 "password": "password",
@@ -473,51 +473,51 @@ class TestTomlParseHelpers:
             parse_repositories(data)
 
     def test_should_raise_exception_when_repository_structure_is_incorrect(self):
-        data: List[Tuple] = [("repository_name", "repository_address", "repository_port")]
+        data: list[tuple] = [("repository_name", "repository_address", "repository_port")]
 
         with pytest.raises(KatalogerParseException):
             # noinspection PyTypeChecker
             parse_repositories(data)
 
     def test_should_return_none_when_there_is_no_catalogs(self):
-        expected_catalogs: Optional[List[Catalog]] = None
-        actual_catalogs: Optional[List[Catalog]] = parse_catalogs(data=[], configuration_root_dir=None)
+        expected_catalogs: Optional[list[Catalog]] = None
+        actual_catalogs: Optional[list[Catalog]] = parse_catalogs(data=[], configuration_root_dir=None)
 
         assert actual_catalogs == expected_catalogs
 
     def test_should_parse_unnamed_catalog(self, tmp_catalog: Path):
-        data: List[str] = [str(tmp_catalog)]
+        data: list[str] = [str(tmp_catalog)]
         expected_catalog: Catalog = Catalog.from_path(tmp_catalog)
-        actual_catalogs: Optional[List[Catalog]] = parse_catalogs(data=data, configuration_root_dir=None)
+        actual_catalogs: Optional[list[Catalog]] = parse_catalogs(data=data, configuration_root_dir=None)
 
         assert actual_catalogs == [expected_catalog]
 
     def test_should_raise_exception_when_unnamed_catalog_path_has_incorrect_format(self):
-        data: List = [192.168, 0.1]
+        data: list = [192.168, 0.1]
 
         with pytest.raises(KatalogerParseException):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_unnamed_catalog_has_empty_path(self):
-        data: List[str] = [""]
+        data: list[str] = [""]
 
         with pytest.raises(KatalogerParseException):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_parse_named_catalog(self, tmp_catalog: Path):
-        data: Dict[str, str] = {
+        data: dict[str, str] = {
             self.default_catalog_name: str(tmp_catalog),
         }
         expected_catalog: Catalog = Catalog(
             name=self.default_catalog_name,
             path=tmp_catalog,
         )
-        actual_catalogs: Optional[List[Catalog]] = parse_catalogs(data, configuration_root_dir=None)
+        actual_catalogs: Optional[list[Catalog]] = parse_catalogs(data, configuration_root_dir=None)
 
         assert actual_catalogs == [expected_catalog]
 
     def test_should_raise_exception_when_named_catalog_name_has_incorrect_format(self, tmp_catalog: Path):
-        data: Dict = {
+        data: dict = {
             1: str(tmp_catalog),
         }
 
@@ -525,7 +525,7 @@ class TestTomlParseHelpers:
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_named_catalog_path_has_incorrect_format(self, tmp_catalog: Path):
-        data: Dict = {
+        data: dict = {
             "catalogs": [str(tmp_catalog)],
         }
 
@@ -533,7 +533,7 @@ class TestTomlParseHelpers:
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_named_catalog_has_empty_name(self, tmp_catalog: Path):
-        data: Dict = {
+        data: dict = {
             "": str(tmp_catalog),
         }
 
@@ -541,7 +541,7 @@ class TestTomlParseHelpers:
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_named_catalog_has_empty_path(self):
-        data: Dict = {
+        data: dict = {
             self.default_catalog_name: "",
         }
 
@@ -556,7 +556,7 @@ class TestTomlParseHelpers:
     def test_should_load_catalog_from_path(self):
         version_reference: str = f"{self.default_library_module}.version"
         library_version: str = "1.1.1"
-        catalog: Dict = {
+        catalog: dict = {
             "versions": {version_reference: library_version},
             "libraries": {
                 self.default_artifact_name: {
@@ -589,7 +589,7 @@ class TestTomlParseHelpers:
         assert actual_plugins == [expected_plugin]
 
     def test_should_return_configuration_with_catalogs_when_there_are_catalog_data(self, tmp_catalog: Path):
-        configuration_data: Dict = {
+        configuration_data: dict = {
             "catalogs": {
                 self.default_catalog_name: str(tmp_catalog),
             },
@@ -610,7 +610,7 @@ class TestTomlParseHelpers:
         )
 
     def test_should_return_configuration_with_library_repositories_when_there_are_repositories_data(self):
-        configuration_data: Dict = {
+        configuration_data: dict = {
             "libraries": {
                 self.default_repository_name: self.default_repository_address,
             },
@@ -631,7 +631,7 @@ class TestTomlParseHelpers:
         )
 
     def test_should_return_configuration_with_plugin_repositories_when_there_are_repositories_data(self):
-        configuration_data: Dict = {
+        configuration_data: dict = {
             "plugins": {
                 self.default_repository_name: self.default_repository_address,
             },
@@ -653,7 +653,7 @@ class TestTomlParseHelpers:
 
     def test_should_return_configuration_with_verbose_flag_when_it_specified(self):
         verbose_flag: bool = True
-        configuration_data: Dict = {
+        configuration_data: dict = {
             "verbose": verbose_flag,
         }
 
@@ -669,7 +669,7 @@ class TestTomlParseHelpers:
 
     def test_should_return_configuration_with_suggest_unstable_updates_flag_when_it_specified(self):
         suggest_unstable_updates_flag: bool = False
-        configuration_data: Dict = {
+        configuration_data: dict = {
             "suggest_unstable_updates": suggest_unstable_updates_flag,
         }
 
@@ -685,7 +685,7 @@ class TestTomlParseHelpers:
 
     def test_should_return_configuration_with_fail_on_updates_flag_when_it_specified(self):
         fail_on_updates_flag: bool = True
-        configuration_data: Dict = {
+        configuration_data: dict = {
             "fail_on_updates": fail_on_updates_flag,
         }
 
@@ -700,7 +700,7 @@ class TestTomlParseHelpers:
         )
 
     def test_should_raise_exception_when_boolean_flag_has_incorrect_type(self):
-        configuration_data: Dict = {
+        configuration_data: dict = {
             "verbose": 1,
         }
         toml_parse_helpers.load_toml = Mock(return_value=configuration_data)
@@ -710,10 +710,10 @@ class TestTomlParseHelpers:
 
     @staticmethod
     def __test_load_configuration(
-        configuration_data: Dict,
-        expected_catalogs: Optional[List[Catalog]],
-        expected_library_repositories: Optional[List[Repository]],
-        expected_plugin_repositories: Optional[List[Repository]],
+        configuration_data: dict,
+        expected_catalogs: Optional[list[Catalog]],
+        expected_library_repositories: Optional[list[Repository]],
+        expected_plugin_repositories: Optional[list[Repository]],
         expected_verbose: Optional[bool],
         expected_suggest_unstable_updates: Optional[bool],
         expected_fail_on_updates: Optional[bool],

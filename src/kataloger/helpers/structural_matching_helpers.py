@@ -1,8 +1,8 @@
 from collections import namedtuple
-from typing import Dict, Optional
+from typing import Optional
 
 
-def match(data: Dict, pattern: Dict) -> Optional[namedtuple]:  # noqa PYI024
+def match(data: dict, pattern: dict) -> Optional[namedtuple]:  # noqa PYI024
     """
     Check if a dictionary (`data`) matches a specified pattern (`pattern`).
 
@@ -21,7 +21,7 @@ def match(data: Dict, pattern: Dict) -> Optional[namedtuple]:  # noqa PYI024
     if len(data) != len(pattern):
         return None
 
-    result_data: Dict = {}
+    result_data: dict = {}
     for pattern_key, pattern_value in pattern.items():
         if isinstance(pattern_key, type):
             message: str = f"Can't use types as pattern keys: {pattern}. Key: {pattern_key}."

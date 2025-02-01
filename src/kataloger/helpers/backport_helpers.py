@@ -1,11 +1,11 @@
 import sys
 from pathlib import Path
-from typing import Dict, Union
+from typing import Union
 
 from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
 
 
-def load_toml(path: Path) -> Dict[str, Union[str, Dict]]:
+def load_toml(path: Path) -> dict[str, Union[str, dict]]:
     if sys.version_info < (3, 11):
         import tomli as tomllib
         from tomli import TOMLDecodeError

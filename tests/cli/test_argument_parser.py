@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from kataloger.cli.argument_parser import parse_arguments
 from kataloger.data.catalog import Catalog
@@ -97,7 +97,7 @@ class TestArgumentParser:
     @staticmethod
     def __create_arguments(
         configuration_path: Optional[Path],
-        catalogs: Optional[List[Catalog]],
+        catalogs: Optional[list[Catalog]],
         verbose: Optional[bool],
         suggest_unstable_updates: Optional[bool],
         fail_on_updates: Optional[bool],

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Optional, Union
 
 from yarl import URL
 
@@ -16,9 +16,9 @@ from kataloger.helpers.structural_matching_helpers import match
 
 
 def load_configuration(configuration_path: Path) -> ConfigurationData:
-    catalogs: Optional[List[Catalog]] = None
-    library_repositories: Optional[List[Repository]] = None
-    plugin_repositories: Optional[List[Repository]] = None
+    catalogs: Optional[list[Catalog]] = None
+    library_repositories: Optional[list[Repository]] = None
+    plugin_repositories: Optional[list[Repository]] = None
 
     configuration_data = load_toml(path=configuration_path)
     if "catalogs" in configuration_data:
@@ -38,16 +38,16 @@ def load_configuration(configuration_path: Path) -> ConfigurationData:
     )
 
 
-def load_catalog(catalog_path: Path, verbose: bool) -> Tuple[List[Library], List[Plugin]]:
+def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list[Plugin]]:
     catalog = load_toml(catalog_path)
-    versions: Dict[str, str] = catalog.pop("versions", {})
+    versions: dict[str, str] = catalog.pop("versions", {})
     libraries = parse_libraries(catalog, versions, verbose)
     plugins = parse_plugins(catalog, versions, verbose)
 
     return libraries, plugins
 
 
-def parse_repositories(data: Dict) -> Optional[List[Repository]]:
+def parse_repositories(data: dict) -> Optional[list[Repository]]:
     if not data:
         return None
 
@@ -76,7 +76,7 @@ def parse_repositories(data: Dict) -> Optional[List[Repository]]:
     return repositories
 
 
-def parse_catalogs(data: Union[List, Dict], configuration_root_dir: Optional[Path]) -> Optional[List[Catalog]]:
+def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Path]) -> Optional[list[Catalog]]:
     if not data:
         return None
 
@@ -108,7 +108,7 @@ def parse_catalogs(data: Union[List, Dict], configuration_root_dir: Optional[Pat
     raise KatalogerParseException(message=f'Unexpected catalogs data format: "{data}".')
 
 
-def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose: bool) -> List[Library]:
+def parse_libraries(catalog: dict[str, Union[dict, str]], versions: dict, verbose: bool) -> list[Library]:
     libraries = []
     if "libraries" not in catalog:
         return libraries
@@ -162,7 +162,7 @@ def parse_libraries(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbos
     return libraries
 
 
-def parse_plugins(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose: bool) -> List[Plugin]:
+def parse_plugins(catalog: dict[str, Union[dict, str]], versions: dict, verbose: bool) -> list[Plugin]:
     plugins = []
     if "plugins" not in catalog:
         return plugins
@@ -199,7 +199,7 @@ def parse_plugins(catalog: Dict[str, Union[Dict, str]], versions: Dict, verbose:
     return plugins
 
 
-def __parse_declaration(declaration: str) -> Tuple[str, str]:
+def __parse_declaration(declaration: str) -> tuple[str, str]:
     components = declaration.rsplit(":", 1)
     if len(components) != 2 or not (components[0].strip() and components[1].strip()):
         message = f'Unknown declaration format: "{declaration}".'
@@ -208,7 +208,7 @@ def __parse_declaration(declaration: str) -> Tuple[str, str]:
 
 
 def __get_version_by_reference(
-    versions: Dict[str, str],
+    versions: dict[str, str],
     version_ref: str,
     artifact_name: str,
 ) -> str:
@@ -219,7 +219,7 @@ def __get_version_by_reference(
     return version
 
 
-def __extract_optional_boolean(data: Dict, key: str) -> Optional[bool]:
+def __extract_optional_boolean(data: dict, key: str) -> Optional[bool]:
     value = data.get(key)
     if value is None or isinstance(value, bool):
         return value
