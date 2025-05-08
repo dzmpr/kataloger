@@ -14,6 +14,7 @@ from kataloger.helpers.xml_parse_helpers import try_parse_maven_group_metadata
 async def get_all_artifact_metadata(
     artifacts: list[Artifact],
     repositories: list[Repository],
+    *,
     verbose: bool,
 ) -> dict[Artifact, list[MetadataRepositoryInfo]]:
     if not artifacts:
@@ -21,7 +22,7 @@ async def get_all_artifact_metadata(
 
     search_results: dict[Artifact, list[MetadataRepositoryInfo]] = defaultdict(list)
     for repository in repositories:
-        result = await get_all_artifact_metadata_in_repository(repository, artifacts, verbose)
+        result = await get_all_artifact_metadata_in_repository(repository, artifacts, verbose=verbose)
         for artifact, metadata in result.items():
             search_results[artifact].append(metadata)
     return search_results
@@ -30,6 +31,7 @@ async def get_all_artifact_metadata(
 async def get_all_artifact_metadata_in_repository(
     repository: Repository,
     artifacts: list[Artifact],
+    *,
     verbose: bool,
 ) -> dict[Artifact, MetadataRepositoryInfo]:
     if repository.requires_authorization():
@@ -40,7 +42,7 @@ async def get_all_artifact_metadata_in_repository(
     async with ClientSession(auth=auth) as session:
         requests = []
         for artifact in artifacts:
-            request = get_artifact_metadata(session, repository, artifact, verbose)
+            request = get_artifact_metadata(session, repository, artifact, verbose=verbose)
             requests.append(request)
         results = await asyncio.gather(*requests)
 
@@ -51,6 +53,7 @@ async def get_artifact_metadata(
     session: ClientSession,
     repository: Repository,
     artifact: Artifact,
+    *,
     verbose: bool,
 ) -> Optional[MetadataRepositoryInfo]:
     metadata_url = repository.address / artifact.to_path() / "maven-metadata.xml"

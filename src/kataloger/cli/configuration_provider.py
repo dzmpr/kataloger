@@ -9,7 +9,7 @@ from kataloger.data.configuration_data import ConfigurationData
 from kataloger.data.kataloger_arguments import KatalogerArguments
 from kataloger.data.kataloger_configuration import KatalogerConfiguration
 from kataloger.data.repository import Repository
-from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 from kataloger.helpers.path_helpers import file_exists, get_package_file
 from kataloger.helpers.toml_parse_helpers import load_configuration
 
@@ -73,7 +73,7 @@ def get_catalogs(arg_catalogs: Optional[list[Catalog]], conf_catalogs: Optional[
     message = ("Gradle version catalog not found in current directory. "
                "Please specify path to catalog via parameter, in configuration "
                "file or run tool from directory with catalog (*.versions.toml) file.")
-    raise KatalogerConfigurationException(message)
+    raise KatalogerConfigurationError(message)
 
 
 def get_repositories(
@@ -96,7 +96,7 @@ def get_repositories(
 
     message = ("No repositories provided! You can specify repositories to "
                "search artifact updates through configuration file.")
-    raise KatalogerConfigurationException(message)
+    raise KatalogerConfigurationError(message)
 
 
 def find_cwd_catalogs() -> Optional[list[Catalog]]:
@@ -118,5 +118,5 @@ def load_configuration_data(configuration_path: Optional[Path]) -> Configuration
             if not file_exists(configuration_path):
                 message: str = ("Can't find default configuration file. "
                                 "Please specify configuration file with -c [PATH] argument.")
-                raise KatalogerConfigurationException(message)
+                raise KatalogerConfigurationError(message)
     return load_configuration(configuration_path)

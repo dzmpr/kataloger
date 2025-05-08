@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 from kataloger.helpers.path_helpers import file_exists, str_to_path
 
 
@@ -17,7 +17,7 @@ class TestPathHelpers:
     def test_should_raise_exception_when_path_string_is_correct_but_file_not_exists(self, tmp_path: Path):
         file_path: Path = tmp_path / "file.txt"
 
-        with pytest.raises(KatalogerConfigurationException):
+        with pytest.raises(KatalogerConfigurationError):
             str_to_path(str(file_path))
 
     def test_should_resolve_relative_path_to_the_root_and_return_resolved_path(self, tmp_path: Path):
@@ -35,7 +35,7 @@ class TestPathHelpers:
         root_path: Path = tmp_path.parent
         relative_file_path: Path = file_path.relative_to(root_path)
 
-        with pytest.raises(KatalogerConfigurationException):
+        with pytest.raises(KatalogerConfigurationError):
             str_to_path(path_string=str(relative_file_path), root_path=root_path)
 
     def test_should_raise_exception_when_relative_path_provided_without_root_and_cant_be_resolved(self, tmp_path: Path):
@@ -44,7 +44,7 @@ class TestPathHelpers:
         root_path: Path = tmp_path.parent
         relative_file_path: Path = file_path.relative_to(root_path)
 
-        with pytest.raises(KatalogerConfigurationException):
+        with pytest.raises(KatalogerConfigurationError):
             str_to_path(path_string=str(relative_file_path), root_path=None)
 
     def test_should_return_true_when_path_exists_and_its_file(self, tmp_path: Path):

@@ -2,13 +2,13 @@ import asyncio
 import sys
 
 from kataloger.cli import cli
-from kataloger.exceptions.kataloger_exception import KatalogerException
+from kataloger.exceptions.kataloger_exception import KatalogerError
 
 
 def main() -> int:
     try:
         return asyncio.run(cli.run())
-    except KatalogerException as error:
+    except KatalogerError as error:
         print(error.message, file=sys.stderr)
         return 1
     except KeyboardInterrupt:

@@ -3,7 +3,7 @@ from unittest.mock import Mock, mock_open, patch
 
 import pytest
 
-from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
+from kataloger.exceptions.kataloger_parse_exception import KatalogerParseError
 from kataloger.helpers.backport_helpers import load_toml
 
 
@@ -35,5 +35,5 @@ class TestBackportHelpers:
 
     def test_should_raise_exception_when_toml_format_is_incorrect(self):
         toml: bytes = b"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>"""
-        with patch.object(Path, "open", mock_open(read_data=toml)), pytest.raises(KatalogerParseException):
+        with patch.object(Path, "open", mock_open(read_data=toml)), pytest.raises(KatalogerParseError):
             load_toml(path=Mock())

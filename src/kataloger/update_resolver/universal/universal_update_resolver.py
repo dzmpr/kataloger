@@ -14,6 +14,7 @@ class UniversalUpdateResolver(UpdateResolver):
     def __init__(
         self,
         version_factories: list[VersionFactory[Version]],
+        *,
         suggest_unstable_updates: bool,
     ):
         self.version_factories = version_factories

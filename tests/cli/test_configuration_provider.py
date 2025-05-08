@@ -12,7 +12,7 @@ from kataloger.data.configuration_data import ConfigurationData
 from kataloger.data.kataloger_arguments import KatalogerArguments
 from kataloger.data.kataloger_configuration import KatalogerConfiguration
 from kataloger.data.repository import Repository
-from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 
 
 class TestConfigurationProvider:
@@ -68,13 +68,13 @@ class TestConfigurationProvider:
     def test_should_raise_exception_when_cwd_catalogs_are_none(self):
         configuration_provider.find_cwd_catalogs = Mock(return_value=None)
 
-        with pytest.raises(KatalogerConfigurationException):
+        with pytest.raises(KatalogerConfigurationError):
             get_catalogs(arg_catalogs=None, conf_catalogs=None)
 
     def test_should_raise_exception_when_there_are_no_cwd_catalogs(self):
         configuration_provider.find_cwd_catalogs = Mock(return_value=[])
 
-        with pytest.raises(KatalogerConfigurationException):
+        with pytest.raises(KatalogerConfigurationError):
             get_catalogs(arg_catalogs=None, conf_catalogs=None)
 
     def test_should_return_arg_repositories_when_there_are_arg_repositories(self):
@@ -178,7 +178,7 @@ class TestConfigurationProvider:
         )
 
     def test_should_raise_exception_when_there_are_no_arg_or_conf_repositories(self):
-        with pytest.raises(KatalogerConfigurationException):
+        with pytest.raises(KatalogerConfigurationError):
             get_repositories(
                 arg_library_repositories=None,
                 arg_plugin_repositories=None,
@@ -211,6 +211,7 @@ class TestConfigurationProvider:
         self,
         args_fields_value: Optional[bool],
         conf_fields_value: Optional[bool],
+        *,
         expected_value: bool,
     ) -> None:
         args_configuration_data: ConfigurationData = ConfigurationData(

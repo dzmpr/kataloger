@@ -69,18 +69,17 @@ class TestUniversalVersion:
         for version in versions:
             assert UniversalVersion(version).pre_release_number == expected_pre_release_number
 
-    def test_pre_release_index_should_be_calculated_correctly_and_case_independent(self):
-        versions_to_index: dict[str, int] = {
-            "1.2.3-unexpected-pre-release-name01": -1,
-            "1.2.3-dev01": 0,
-            "1.2.3-alpha01": 1,
-            "1.2.3-beta01": 2,
-            "1.2.3-Beta01": 2,
-            "1.2.3-rc01": 3,
-            "1.2.3-RC01": 3,
-        }
-        for version, expected_index in versions_to_index.items():
-            assert UniversalVersion(version)._pre_release_index() == expected_index
+    def test_versions_with_same_number_should_be_compared_case_insensitively_by_pre_release_name(self):
+        versions: list[str] = [
+            "1.2.3-unexpected-pre-release-name01",
+            "1.2.3-dev01",
+            "1.2.3-alPha01",
+            "1.2.3-Beta01",
+            "1.2.3-RC01",
+        ]
+        sorted_versions: list[UniversalVersion] = sorted(UniversalVersion(v) for v in versions)
+        for expected, actual in zip(versions, sorted_versions):
+            assert actual.raw == expected
 
     def test_versions_should_considered_as_equal_when_version_string_representations_are_equals(self):
         first_version: UniversalVersion = UniversalVersion("1.2.3-pre-release-name-005")

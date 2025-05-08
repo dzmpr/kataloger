@@ -38,6 +38,7 @@ class TestRepository:
     def _test_require_authorization(
         user: Optional[str],
         password: Optional[str],
+        *,
         expected_requires_authorization: bool,
     ):
         repository: Repository = Repository(

@@ -8,7 +8,7 @@ from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.catalog import Catalog
 from kataloger.data.configuration_data import ConfigurationData
 from kataloger.data.repository import Repository
-from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
+from kataloger.exceptions.kataloger_parse_exception import KatalogerParseError
 from kataloger.helpers.backport_helpers import load_toml
 from kataloger.helpers.log_helpers import log_warning
 from kataloger.helpers.path_helpers import str_to_path
@@ -38,11 +38,11 @@ def load_configuration(configuration_path: Path) -> ConfigurationData:
     )
 
 
-def load_catalog(catalog_path: Path, verbose: bool) -> tuple[list[Library], list[Plugin]]:
+def load_catalog(catalog_path: Path, *, verbose: bool) -> tuple[list[Library], list[Plugin]]:
     catalog = load_toml(catalog_path)
     versions: dict[str, str] = catalog.pop("versions", {})
-    libraries = parse_libraries(catalog, versions, verbose)
-    plugins = parse_plugins(catalog, versions, verbose)
+    libraries = parse_libraries(catalog, versions, verbose=verbose)
+    plugins = parse_plugins(catalog, versions, verbose=verbose)
 
     return libraries, plugins
 
@@ -52,12 +52,12 @@ def parse_repositories(data: dict) -> Optional[list[Repository]]:
         return None
 
     if not isinstance(data, dict):
-        raise KatalogerParseException(message="Unexpected repository data.")
+        raise KatalogerParseError(message="Unexpected repository data.")
 
     repositories = []
     for name, repository_data in data.items():
         if not isinstance(name, str):
-            raise KatalogerParseException(message=f'Unexpected repository name: "{name}".')
+            raise KatalogerParseError(message=f'Unexpected repository name: "{name}".')
 
         repository: Repository
         if isinstance(repository_data, str):
@@ -70,7 +70,7 @@ def parse_repositories(data: dict) -> Optional[list[Repository]]:
                 password=mr.password,
             )
         else:
-            raise KatalogerParseException(message="Unexpected repository data.")
+            raise KatalogerParseError(message="Unexpected repository data.")
         repositories.append(repository)
 
     return repositories
@@ -84,9 +84,9 @@ def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Pat
     if isinstance(data, list):
         for path in data:
             if not isinstance(path, str):
-                raise KatalogerParseException(message=f'Unexpected catalog path: "{path}".')
+                raise KatalogerParseError(message=f'Unexpected catalog path: "{path}".')
             if not path.strip():
-                raise KatalogerParseException(message="Catalog path can't be empty!")
+                raise KatalogerParseError(message="Catalog path can't be empty!")
 
             catalogs.append(Catalog.from_path(path=str_to_path(path, root_path=configuration_root_dir)))
         return catalogs
@@ -94,28 +94,33 @@ def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Pat
     if isinstance(data, dict):
         for name, path in data.items():
             if not isinstance(name, str):
-                raise KatalogerParseException(message=f'Unexpected catalog name: "{name}".')
+                raise KatalogerParseError(message=f'Unexpected catalog name: "{name}".')
             if not isinstance(path, str):
-                raise KatalogerParseException(message=f'Unexpected catalog path: "{path}".')
+                raise KatalogerParseError(message=f'Unexpected catalog path: "{path}".')
             if not name.strip():
-                raise KatalogerParseException(message="Catalog name can't be empty!")
+                raise KatalogerParseError(message="Catalog name can't be empty!")
             if not path.strip():
-                raise KatalogerParseException(message=f'Catalog "{name}" has empty path!')
+                raise KatalogerParseError(message=f'Catalog "{name}" has empty path!')
 
             catalogs.append(Catalog(name=name, path=str_to_path(path, root_path=configuration_root_dir)))
         return catalogs
 
-    raise KatalogerParseException(message=f'Unexpected catalogs data format: "{data}".')
+    raise KatalogerParseError(message=f'Unexpected catalogs data format: "{data}".')
 
 
-def parse_libraries(catalog: dict[str, Union[dict, str]], versions: dict, verbose: bool) -> list[Library]:
+def parse_libraries(
+    catalog: dict[str,Union[dict, str]],
+    versions: dict,
+    *,
+    verbose: bool,
+) -> list[Library]:
     libraries = []
     if "libraries" not in catalog:
         return libraries
 
     for name, library_data in catalog["libraries"].items():
         if not isinstance(name, str):
-            raise KatalogerParseException(message=f'Unexpected library name: "{name}".')
+            raise KatalogerParseError(message=f'Unexpected library name: "{name}".')
 
         library: Library
         if isinstance(library_data, str):
@@ -155,21 +160,26 @@ def parse_libraries(catalog: dict[str, Union[dict, str]], versions: dict, verbos
             continue
         else:
             message = f"Unknown library notation: {library_data}"
-            raise KatalogerParseException(message)
+            raise KatalogerParseError(message)
 
         libraries.append(library)
 
     return libraries
 
 
-def parse_plugins(catalog: dict[str, Union[dict, str]], versions: dict, verbose: bool) -> list[Plugin]:
+def parse_plugins(
+    catalog: dict[str, Union[dict, str]],
+    versions: dict,
+    *,
+    verbose: bool,
+) -> list[Plugin]:
     plugins = []
     if "plugins" not in catalog:
         return plugins
 
     for name, plugin_data in catalog["plugins"].items():
         if not isinstance(name, str):
-            raise KatalogerParseException(message=f'Unexpected plugin name: "{name}".')
+            raise KatalogerParseError(message=f'Unexpected plugin name: "{name}".')
 
         if isinstance(plugin_data, str):
             (plugin_id, version) = __parse_declaration(plugin_data)
@@ -192,7 +202,7 @@ def parse_plugins(catalog: dict[str, Union[dict, str]], versions: dict, verbose:
             continue
         else:
             message = f"Unknown plugin notation: {plugin_data}"
-            raise KatalogerParseException(message)
+            raise KatalogerParseError(message)
 
         plugins.append(plugin)
 
@@ -203,7 +213,7 @@ def __parse_declaration(declaration: str) -> tuple[str, str]:
     components = declaration.rsplit(":", 1)
     if len(components) != 2 or not (components[0].strip() and components[1].strip()):
         message = f'Unknown declaration format: "{declaration}".'
-        raise KatalogerParseException(message)
+        raise KatalogerParseError(message)
     return components[0], components[1]
 
 
@@ -214,7 +224,7 @@ def __get_version_by_reference(
 ) -> str:
     if not (version := versions.get(version_ref)):
         message = f'Version for "{artifact_name}" not specified by reference "{version_ref}".'
-        raise KatalogerParseException(message)
+        raise KatalogerParseError(message)
 
     return version
 
@@ -225,4 +235,4 @@ def __extract_optional_boolean(data: dict, key: str) -> Optional[bool]:
         return value
 
     message = f'Configuration field "{key}" has incorrect value "{value}", while expected boolean type.'
-    raise KatalogerParseException(message)
+    raise KatalogerParseError(message)

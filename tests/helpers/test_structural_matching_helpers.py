@@ -56,11 +56,11 @@ class TestStructuralMatchingHelpers:
         assert nested_mr == match(data[top_level_key], pattern[top_level_key])
         assert getattr(nested_mr, self.default_key) == self.default_value
 
-    def test_match_should_raise_value_error_when_pattern_key_is_a_type(self):
+    def test_match_should_raise_type_error_when_pattern_key_is_a_type(self):
         data: dict = {self.default_key: self.default_value}
         pattern: dict = {str: self.default_value}
 
-        with pytest.raises(ValueError, match="Can't use types as pattern keys:.*"):
+        with pytest.raises(TypeError, match="Can't use types as pattern keys:.*"):
             match(data, pattern)
 
     def test_should_return_none_when_pattern_is_not_dictionary(self):

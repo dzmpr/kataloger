@@ -1,6 +1,6 @@
-from kataloger.exceptions.kataloger_exception import KatalogerException
+from kataloger.exceptions.kataloger_exception import KatalogerError
 
 
-class KatalogerConfigurationException(KatalogerException):
+class KatalogerConfigurationError(KatalogerError):
     def __init__(self, message: str):
         super().__init__(message)

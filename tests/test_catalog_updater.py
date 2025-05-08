@@ -9,7 +9,7 @@ from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.artifact_update import ArtifactUpdate
 from kataloger.data.repository import Repository
-from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 from kataloger.update_resolver.base.update_resolution import UpdateResolution
 from kataloger.update_resolver.base.update_resolver import UpdateResolver
 
@@ -17,7 +17,7 @@ from kataloger.update_resolver.base.update_resolver import UpdateResolver
 class TestCatalogUpdater:
 
     def test_should_raise_configuration_exception_when_no_library_and_plugin_repositories_provided(self):
-        with pytest.raises(KatalogerConfigurationException, match="No repositories provided!"):
+        with pytest.raises(KatalogerConfigurationError, match="No repositories provided!"):
             self._create_catalog_updater(
                 library_repositories=[],
                 plugin_repositories=[],
@@ -42,7 +42,7 @@ class TestCatalogUpdater:
 
     def test_should_raise_configuration_exception_when_no_update_resolvers_provided(self):
         repository: Repository = EntityFactory.create_repository()
-        with pytest.raises(KatalogerConfigurationException, match="No update resolvers provided!"):
+        with pytest.raises(KatalogerConfigurationError, match="No update resolvers provided!"):
             self._create_catalog_updater(
                 library_repositories=[repository],
                 plugin_repositories=[repository],
@@ -369,6 +369,7 @@ class TestCatalogUpdater:
         library_repositories: Optional[list[Repository]] = None,
         plugin_repositories: Optional[list[Repository]] = None,
         update_resolvers: Optional[list[UpdateResolver]] = None,
+        *,
         verbose: bool = False,
     ) -> CatalogUpdater:
         if not library_repositories:

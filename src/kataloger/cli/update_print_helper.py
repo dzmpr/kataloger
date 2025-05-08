@@ -5,6 +5,7 @@ def print_catalog_updates(
     updates: list[ArtifactUpdate],
     catalog_name: str,
     catalog_count: int,
+    *,
     verbose: bool,
 ) -> None:
     if catalog_count > 1:
@@ -21,4 +22,4 @@ def print_catalog_updates(
             print(f"{update.name} {version_part}")
 
     if catalog_count > 1:
-        print("")
+        print()

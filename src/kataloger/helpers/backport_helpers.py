@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from typing import Union
 
-from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
+from kataloger.exceptions.kataloger_parse_exception import KatalogerParseError
 
 
 def load_toml(path: Path) -> dict[str, Union[str, dict]]:
@@ -18,4 +18,4 @@ def load_toml(path: Path) -> dict[str, Union[str, dict]]:
             return tomllib.load(file)
         except TOMLDecodeError as parse_error:
             message = f"Can't parse TOML in \"{path.name}\"."
-            raise KatalogerParseException(message) from parse_error
+            raise KatalogerParseError(message) from parse_error

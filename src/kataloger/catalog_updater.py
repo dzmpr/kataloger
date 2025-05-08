@@ -7,7 +7,7 @@ from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.artifact_update import ArtifactUpdate
 from kataloger.data.metadata_repository_info import MetadataRepositoryInfo
 from kataloger.data.repository import Repository
-from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 from kataloger.helpers.log_helpers import log_warning
 from kataloger.helpers.toml_parse_helpers import load_catalog
 from kataloger.helpers.update_helpers import get_all_artifact_metadata
@@ -21,15 +21,16 @@ class CatalogUpdater:
         library_repositories: list[Repository],
         plugin_repositories: list[Repository],
         update_resolvers: list[UpdateResolver],
+        *,
         verbose: bool = False,
     ):
         if not (library_repositories or plugin_repositories):
             message = "No repositories provided!"
-            raise KatalogerConfigurationException(message)
+            raise KatalogerConfigurationError(message)
 
         if not update_resolvers:
             message = "No update resolvers provided!"
-            raise KatalogerConfigurationException(message)
+            raise KatalogerConfigurationError(message)
 
         self.library_repositories = library_repositories
         self.plugin_repositories = plugin_repositories
@@ -37,7 +38,7 @@ class CatalogUpdater:
         self.verbose = verbose
 
     async def get_catalog_updates(self, catalog_path: Path) -> list[ArtifactUpdate]:
-        libraries, plugins = load_catalog(catalog_path, self.verbose)
+        libraries, plugins = load_catalog(catalog_path, verbose=self.verbose)
         if not (libraries or plugins):
             if self.verbose:
                 log_warning(f'Catalog "{catalog_path.name}" is empty.')

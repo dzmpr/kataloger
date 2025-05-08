@@ -13,7 +13,7 @@ def match(data: dict, pattern: dict) -> Optional[namedtuple]:  # noqa PYI024
     :param data: The dictionary to be checked against the pattern.
     :param pattern: The dictionary defining the structure and expected types for matching.
     :return: A named tuple with the matching values if `data` matches `pattern`. `None` if there is no match.
-    :raise ValueError: If a type is used as a key in the `pattern` dictionary.
+    :raise TypeError: If a type is used as a key in the `pattern` dictionary.
     """
     if not (isinstance(data, dict) or isinstance(pattern, dict)):
         return None
@@ -25,7 +25,7 @@ def match(data: dict, pattern: dict) -> Optional[namedtuple]:  # noqa PYI024
     for pattern_key, pattern_value in pattern.items():
         if isinstance(pattern_key, type):
             message: str = f"Can't use types as pattern keys: {pattern}. Key: {pattern_key}."
-            raise ValueError(message)
+            raise TypeError(message)
 
         if pattern_key not in data:
             return None

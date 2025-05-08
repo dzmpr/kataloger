@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from kataloger import package_name
-from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationException
+from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 
 
 def str_to_path(path_string: str, root_path: Optional[Path] = None) -> Path:
@@ -21,7 +21,7 @@ def str_to_path(path_string: str, root_path: Optional[Path] = None) -> Path:
         path = (root_path / path).resolve()
 
     if not file_exists(path):
-        raise KatalogerConfigurationException(message=f'Incorrect path: "{path_string}".')
+        raise KatalogerConfigurationError(message=f'Incorrect path: "{path_string}".')
 
     return path
 

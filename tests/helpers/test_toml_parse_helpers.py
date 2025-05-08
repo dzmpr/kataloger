@@ -10,7 +10,7 @@ from kataloger.data.artifact.plugin import Plugin
 from kataloger.data.catalog import Catalog
 from kataloger.data.configuration_data import ConfigurationData
 from kataloger.data.repository import Repository
-from kataloger.exceptions.kataloger_parse_exception import KatalogerParseException
+from kataloger.exceptions.kataloger_parse_exception import KatalogerParseError
 from kataloger.helpers import toml_parse_helpers
 from kataloger.helpers.toml_parse_helpers import (
     load_catalog,
@@ -60,7 +60,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_declaration_has_no_coordinates(self):
@@ -70,7 +70,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_declaration_has_no_colon_delimiter(self):
@@ -80,7 +80,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_declaration_is_empty(self):
@@ -90,7 +90,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_parse_plugin_when_it_has_id_and_version(self):
@@ -141,7 +141,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_structure_is_incorrect(self):
@@ -154,7 +154,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_plugin_name_is_not_string(self):
@@ -167,7 +167,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_plugins(catalog, versions={}, verbose=False)
 
     def test_should_return_empty_libraries_list_when_catalog_has_no_libraries(self):
@@ -199,7 +199,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_declaration_has_no_coordinates(self):
@@ -209,7 +209,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_declaration_has_no_colon_delimiter(self):
@@ -219,7 +219,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_declaration_is_empty(self):
@@ -229,7 +229,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_parse_library_when_it_has_group_name_and_version(self):
@@ -304,7 +304,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_parse_library_when_it_has_module_and_version(self):
@@ -365,7 +365,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_structure_is_incorrect(self):
@@ -378,7 +378,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_raise_exception_when_library_name_is_not_string(self):
@@ -388,7 +388,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_return_none_when_there_is_no_repositories(self):
@@ -436,7 +436,7 @@ class TestTomlParseHelpers:
             42: self.default_repository_address,
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_repositories(data)
 
     def test_should_raise_exception_when_there_is_no_repository_password_but_address_and_user_present(self):
@@ -447,7 +447,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_repositories(data)
 
     def test_should_raise_exception_when_there_is_no_repository_user_but_address_and_password_present(self):
@@ -458,7 +458,7 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_repositories(data)
 
     def test_should_raise_exception_when_there_is_no_repository_address_but_user_and_password_present(self):
@@ -469,13 +469,13 @@ class TestTomlParseHelpers:
             },
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_repositories(data)
 
     def test_should_raise_exception_when_repository_structure_is_incorrect(self):
         data: list[tuple] = [("repository_name", "repository_address", "repository_port")]
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             # noinspection PyTypeChecker
             parse_repositories(data)
 
@@ -495,13 +495,13 @@ class TestTomlParseHelpers:
     def test_should_raise_exception_when_unnamed_catalog_path_has_incorrect_format(self):
         data: list = [192.168, 0.1]
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_unnamed_catalog_has_empty_path(self):
         data: list[str] = [""]
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_parse_named_catalog(self, tmp_catalog: Path):
@@ -521,7 +521,7 @@ class TestTomlParseHelpers:
             1: str(tmp_catalog),
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_named_catalog_path_has_incorrect_format(self, tmp_catalog: Path):
@@ -529,7 +529,7 @@ class TestTomlParseHelpers:
             "catalogs": [str(tmp_catalog)],
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_named_catalog_has_empty_name(self, tmp_catalog: Path):
@@ -537,7 +537,7 @@ class TestTomlParseHelpers:
             "": str(tmp_catalog),
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_named_catalog_has_empty_path(self):
@@ -545,11 +545,11 @@ class TestTomlParseHelpers:
             self.default_catalog_name: "",
         }
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             parse_catalogs(data, configuration_root_dir=None)
 
     def test_should_raise_exception_when_catalog_data_format_is_incorrect(self, tmp_catalog: Path):
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             # noinspection PyTypeChecker
             parse_catalogs(data=str(tmp_catalog), configuration_root_dir=None)
 
@@ -705,7 +705,7 @@ class TestTomlParseHelpers:
         }
         toml_parse_helpers.load_toml = Mock(return_value=configuration_data)
 
-        with pytest.raises(KatalogerParseException):
+        with pytest.raises(KatalogerParseError):
             load_configuration(configuration_path=Mock())
 
     @staticmethod

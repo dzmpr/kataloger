@@ -56,6 +56,7 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = [
+    "ERA", # eradicate
     "F", # pyflakes
     "E", # pycodestyle errors
     "W", # pycodestyle warnings
@@ -63,22 +64,33 @@ select = [
     "UP", # pyupgrade
     "YTT", # flake8-2020
     "ANN", # flake8-annotations
+    "ASYNC", # flake8-async
+    "FBT", # flake8-boolean-trap
     "B", # flake8-bugbear
     "A", # flake8-builtins
     "COM", # flake8-commas
     "C4", # flake8-comprehensions
     "EM", # flake8-errmsg
     "ISC", # flake8-implicit-str-concat
+    "LOG", # flake8-logging
+    "G", # flake8-logging-format
+    "INP", # flake8-no-pep420
     "PIE", # flake8-pie
     "PYI", # flake8-pyi
     "PT", # flake8-pytest-style
     "Q", # flake8-quotes
     "RSE", # flake8-raise
     "RET", # flake8-return
+    "SLF", # flake8-self
     "SIM", # flake8-simplify
+    "SLOT", # flake8-slots
     "ARG", # flake8-unused-arguments
     "PTH", # flake8-use-pathlib
+    "FLY", # flynt
+    "N", # pep8-naming
     "PERF", # perflint
+    "FURB", # refurb
+    "TRY", # tryceratops
 ]
 ignore = [
     "ANN204", # return type annotation for special methods
