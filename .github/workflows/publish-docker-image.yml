@@ -1,4 +1,4 @@
-name: Publish Docker image to GHCR
+name: Publish docker image
 
 on:
   workflow_dispatch:
