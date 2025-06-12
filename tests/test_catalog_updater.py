@@ -3,7 +3,6 @@ from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
 
-from entity_factory import EntityFactory
 from kataloger.catalog_updater import CatalogUpdater
 from kataloger.data.artifact.library import Library
 from kataloger.data.artifact.plugin import Plugin
@@ -12,6 +11,7 @@ from kataloger.data.repository import Repository
 from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 from kataloger.update_resolver.base.update_resolution import UpdateResolution
 from kataloger.update_resolver.base.update_resolver import UpdateResolver
+from tests.entity_factory import EntityFactory
 
 
 class TestCatalogUpdater:
