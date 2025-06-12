@@ -82,7 +82,7 @@ pip install kataloger
 #### Docker
 Alternatively, you can run kataloger as a Docker container. The image is published on GitHub Container Registry (GHCR):
 ```commandline
-docker run --rm -v "$(pwd)":/project --network=bridge kataloger ghcr.io/dzmpr/kataloger:latest
+docker run --rm -v "$(pwd)":/project --network=bridge ghcr.io/dzmpr/kataloger:latest
 ```
 This command mounts the current working directory to the `/project` directory inside the container, connects the container to the default `bridge` network, and runs kataloger inside the container.
 
