@@ -50,7 +50,7 @@ jobs:
           echo "ERROR: Can't find package version!"
           exit 1
         fi
-        echo "::set-output name=package_version::$version"
+        echo "package_version=$version" >> "$GITHUB_OUTPUT"
 
     - uses: softprops/action-gh-release@v2
       name: Create release

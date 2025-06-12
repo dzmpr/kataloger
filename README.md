@@ -70,11 +70,21 @@ kataloger -p ~/ProjectDir/libs.versions.toml
 `-f` or `--fail-on-updates` — if specified return non-zero exit code when at least one update found. Can be useful on CI.  
 
 ### Installation
+Kataloger is available on the Python Package Index (PyPI) and also as a Docker container.
 
-Kataloger available in Python Package Index (PyPI). You can install kataloger using pip (requires python 3.9 and greater):
+
+#### PyPI
+To install kataloger using pip (requires Python 3.9 or later), run the following command:
 ```commandline
 pip install kataloger
 ```
+
+#### Docker
+Alternatively, you can run kataloger as a Docker container. The image is published on GitHub Container Registry (GHCR):
+```commandline
+docker run --rm -v "$(pwd)":/project --network=bridge kataloger ghcr.io/dzmpr/kataloger:latest
+```
+This command mounts the current working directory to the `/project` directory inside the container, connects the container to the default `bridge` network, and runs kataloger inside the container.
 
 ### Use kataloger in python scripts
 Kataloger has convenient API (I did my best), so you can write custom logic on top. More info about it can be found [here](./src/kataloger/update_resolver).

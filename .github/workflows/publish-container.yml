@@ -1,0 +1,56 @@
+name: Publish Docker image to GHCR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
+
+    - name: Read package version
+      id: version
+      run: |
+        export PYTHONPATH=./src
+        version=$(python -c "from kataloger import __version__; print(__version__)")
+        if [ -z "$version" ]; then
+          echo "ERROR: Can't find package version!"
+          exit 1
+        fi
+        echo "package_version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Extract metadata for image
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          ${{ steps.version.outputs.package_version }}
+          latest
+
+    - name: Log in to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
