@@ -1,12 +1,11 @@
 from importlib.resources import as_file, files
 from pathlib import Path
-from typing import Optional
 
 from kataloger import package_name
 from kataloger.exceptions.kataloger_configuration_exception import KatalogerConfigurationError
 
 
-def str_to_path(path_string: str, root_path: Optional[Path] = None) -> Path:
+def str_to_path(path_string: str, root_path: Path | None = None) -> Path:
     """
     Converts a string representing a file path into a Path object. It expands user tilde (~) and resolves relative
     paths against a provided base path. It also verifies the existence of the file at the specified path.

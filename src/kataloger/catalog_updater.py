@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from kataloger.data.artifact.artifact import Artifact
 from kataloger.data.artifact.library import Library
@@ -98,7 +97,7 @@ class CatalogUpdater:
         self,
         artifact: Artifact,
         repositories_metadata: list[MetadataRepositoryInfo],
-    ) -> Optional[ArtifactUpdate]:
+    ) -> ArtifactUpdate | None:
         for resolver in self.update_resolvers:
             (resolution, optional_update) = resolver.resolve(artifact, repositories_metadata)
             if resolution == UpdateResolution.CANT_RESOLVE:

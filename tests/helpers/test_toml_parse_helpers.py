@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 from unittest.mock import Mock
 
 import pytest
@@ -392,8 +391,8 @@ class TestTomlParseHelpers:
             parse_libraries(catalog, versions={}, verbose=False)
 
     def test_should_return_none_when_there_is_no_repositories(self):
-        expected_repositories: Optional[list[Repository]] = None
-        actual_repositories: Optional[list[Repository]] = parse_repositories(data={})
+        expected_repositories: list[Repository] | None = None
+        actual_repositories: list[Repository] | None = parse_repositories(data={})
 
         assert actual_repositories == expected_repositories
 
@@ -480,15 +479,15 @@ class TestTomlParseHelpers:
             parse_repositories(data)
 
     def test_should_return_none_when_there_is_no_catalogs(self):
-        expected_catalogs: Optional[list[Catalog]] = None
-        actual_catalogs: Optional[list[Catalog]] = parse_catalogs(data=[], configuration_root_dir=None)
+        expected_catalogs: list[Catalog] | None = None
+        actual_catalogs: list[Catalog] | None = parse_catalogs(data=[], configuration_root_dir=None)
 
         assert actual_catalogs == expected_catalogs
 
     def test_should_parse_unnamed_catalog(self, tmp_catalog: Path):
         data: list[str] = [str(tmp_catalog)]
         expected_catalog: Catalog = Catalog.from_path(tmp_catalog)
-        actual_catalogs: Optional[list[Catalog]] = parse_catalogs(data=data, configuration_root_dir=None)
+        actual_catalogs: list[Catalog] | None = parse_catalogs(data=data, configuration_root_dir=None)
 
         assert actual_catalogs == [expected_catalog]
 
@@ -512,7 +511,7 @@ class TestTomlParseHelpers:
             name=self.default_catalog_name,
             path=tmp_catalog,
         )
-        actual_catalogs: Optional[list[Catalog]] = parse_catalogs(data, configuration_root_dir=None)
+        actual_catalogs: list[Catalog] | None = parse_catalogs(data, configuration_root_dir=None)
 
         assert actual_catalogs == [expected_catalog]
 
@@ -711,12 +710,13 @@ class TestTomlParseHelpers:
     @staticmethod
     def __test_load_configuration(
         configuration_data: dict,
-        expected_catalogs: Optional[list[Catalog]],
-        expected_library_repositories: Optional[list[Repository]],
-        expected_plugin_repositories: Optional[list[Repository]],
-        expected_verbose: Optional[bool],
-        expected_suggest_unstable_updates: Optional[bool],
-        expected_fail_on_updates: Optional[bool],
+        expected_catalogs: list[Catalog] | None,
+        expected_library_repositories: list[Repository] | None,
+        expected_plugin_repositories: list[Repository] | None,
+        *,
+        expected_verbose: bool | None,
+        expected_suggest_unstable_updates: bool | None,
+        expected_fail_on_updates: bool | None,
     ):
         expected_configuration: ConfigurationData = ConfigurationData(
             catalogs=expected_catalogs,

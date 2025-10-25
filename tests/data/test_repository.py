@@ -1,5 +1,3 @@
-from typing import Optional
-
 from yarl import URL
 
 from kataloger.data.repository import Repository
@@ -36,8 +34,8 @@ class TestRepository:
 
     @staticmethod
     def _test_require_authorization(
-        user: Optional[str],
-        password: Optional[str],
+        user: str | None,
+        password: str | None,
         *,
         expected_requires_authorization: bool,
     ):

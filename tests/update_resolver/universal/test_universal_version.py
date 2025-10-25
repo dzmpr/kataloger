@@ -78,7 +78,7 @@ class TestUniversalVersion:
             "1.2.3-RC01",
         ]
         sorted_versions: list[UniversalVersion] = sorted(UniversalVersion(v) for v in versions)
-        for expected, actual in zip(versions, sorted_versions):
+        for expected, actual in zip(versions, sorted_versions, strict=True):
             assert actual.raw == expected
 
     def test_versions_should_considered_as_equal_when_version_string_representations_are_equals(self):

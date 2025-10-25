@@ -1,6 +1,5 @@
 import asyncio
 from collections import defaultdict
-from typing import Optional
 
 from aiohttp import BasicAuth, ClientSession
 
@@ -46,7 +45,7 @@ async def get_all_artifact_metadata_in_repository(
             requests.append(request)
         results = await asyncio.gather(*requests)
 
-    return {artifact: metadata for artifact, metadata in zip(artifacts, results) if metadata}
+    return {artifact: metadata for artifact, metadata in zip(artifacts, results, strict=True) if metadata}
 
 
 async def get_artifact_metadata(
@@ -55,7 +54,7 @@ async def get_artifact_metadata(
     artifact: Artifact,
     *,
     verbose: bool,
-) -> Optional[MetadataRepositoryInfo]:
+) -> MetadataRepositoryInfo | None:
     metadata_url = repository.address / artifact.to_path() / "maven-metadata.xml"
     async with session.get(metadata_url) as response:
         if response.status != 200:

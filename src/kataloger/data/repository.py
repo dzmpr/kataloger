@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from yarl import URL
 
@@ -8,8 +7,8 @@ from yarl import URL
 class Repository:
     name: str
     address: URL
-    user: Optional[str] = None
-    password: Optional[str] = None
+    user: str | None = None
+    password: str | None = None
 
     def __repr__(self):
         return self.name

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from yarl import URL
 
 from kataloger.data.artifact.library import Library
@@ -13,8 +11,8 @@ class EntityFactory:
     def create_repository(
         name: str = "default_repository",
         address: URL = "https://reposito.ry/",
-        user: Optional[str] = None,
-        password: Optional[str] = None,
+        user: str | None = None,
+        password: str | None = None,
     ) -> Repository:
         return Repository(
             name=name,

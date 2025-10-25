@@ -1,4 +1,3 @@
-from typing import Optional
 from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
@@ -359,16 +358,16 @@ class TestCatalogUpdater:
         assert load_metadata_mock.call_args_list == expected_load_metadata_calls
 
     @staticmethod
-    def _create_resolver_mock(resolution: UpdateResolution, update: Optional[ArtifactUpdate] = None) -> Mock:
+    def _create_resolver_mock(resolution: UpdateResolution, update: ArtifactUpdate | None = None) -> Mock:
         resolver_mock = Mock()
         resolver_mock.resolve.return_value = (resolution, update)
         return resolver_mock
 
     @staticmethod
     def _create_catalog_updater(
-        library_repositories: Optional[list[Repository]] = None,
-        plugin_repositories: Optional[list[Repository]] = None,
-        update_resolvers: Optional[list[UpdateResolver]] = None,
+        library_repositories: list[Repository] | None = None,
+        plugin_repositories: list[Repository] | None = None,
+        update_resolvers: list[UpdateResolver] | None = None,
         *,
         verbose: bool = False,
     ) -> CatalogUpdater:

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional, Union
 
 from yarl import URL
 
@@ -16,9 +15,9 @@ from kataloger.helpers.structural_matching_helpers import match
 
 
 def load_configuration(configuration_path: Path) -> ConfigurationData:
-    catalogs: Optional[list[Catalog]] = None
-    library_repositories: Optional[list[Repository]] = None
-    plugin_repositories: Optional[list[Repository]] = None
+    catalogs: list[Catalog] | None = None
+    library_repositories: list[Repository] | None = None
+    plugin_repositories: list[Repository] | None = None
 
     configuration_data = load_toml(path=configuration_path)
     if "catalogs" in configuration_data:
@@ -47,7 +46,7 @@ def load_catalog(catalog_path: Path, *, verbose: bool) -> tuple[list[Library], l
     return libraries, plugins
 
 
-def parse_repositories(data: dict) -> Optional[list[Repository]]:
+def parse_repositories(data: dict) -> list[Repository] | None:
     if not data:
         return None
 
@@ -76,7 +75,7 @@ def parse_repositories(data: dict) -> Optional[list[Repository]]:
     return repositories
 
 
-def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Path]) -> Optional[list[Catalog]]:
+def parse_catalogs(data: list | dict, configuration_root_dir: Path | None) -> list[Catalog] | None:
     if not data:
         return None
 
@@ -109,7 +108,7 @@ def parse_catalogs(data: Union[list, dict], configuration_root_dir: Optional[Pat
 
 
 def parse_libraries(
-    catalog: dict[str,Union[dict, str]],
+    catalog: dict[str, str | dict],
     versions: dict,
     *,
     verbose: bool,
@@ -168,7 +167,7 @@ def parse_libraries(
 
 
 def parse_plugins(
-    catalog: dict[str, Union[dict, str]],
+    catalog: dict[str, str | dict],
     versions: dict,
     *,
     verbose: bool,
@@ -229,7 +228,7 @@ def __get_version_by_reference(
     return version
 
 
-def __extract_optional_boolean(data: dict, key: str) -> Optional[bool]:
+def __extract_optional_boolean(data: dict, key: str) -> bool | None:
     value = data.get(key)
     if value is None or isinstance(value, bool):
         return value

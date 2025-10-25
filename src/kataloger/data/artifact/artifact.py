@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True)
 class Artifact(ABC):
-    name: Optional[str]
+    name: str | None
     coordinates: str
     version: str
 

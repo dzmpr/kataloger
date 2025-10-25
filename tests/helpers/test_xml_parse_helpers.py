@@ -1,5 +1,3 @@
-from typing import Optional
-
 from kataloger.data.artifact_metadata import ArtifactMetadata
 from kataloger.helpers.xml_parse_helpers import try_parse_maven_group_metadata
 
@@ -23,7 +21,7 @@ class TestXmlParseHelpers:
             versions=[self.default_release_version, self.default_latest_version],
             last_updated=self.default_last_updated,
         )
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata == expected_metadata
 
@@ -40,7 +38,7 @@ class TestXmlParseHelpers:
             versions=[self.default_release_version, self.default_latest_version],
             last_updated=self.default_last_updated,
         )
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata == expected_metadata
 
@@ -57,7 +55,7 @@ class TestXmlParseHelpers:
             versions=[self.default_release_version, self.default_latest_version],
             last_updated=self.default_last_updated,
         )
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata == expected_metadata
 
@@ -74,7 +72,7 @@ class TestXmlParseHelpers:
             versions=[self.default_latest_version],
             last_updated=self.default_last_updated,
         )
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata == expected_metadata
 
@@ -91,7 +89,7 @@ class TestXmlParseHelpers:
             versions=[self.default_release_version, self.default_latest_version],
             last_updated=0,
         )
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata == expected_metadata
 
@@ -113,7 +111,7 @@ class TestXmlParseHelpers:
             versions=[self.default_latest_version],
             last_updated=0,
         )
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata == expected_metadata
 
@@ -124,7 +122,7 @@ class TestXmlParseHelpers:
             versions=[],
             last_updated=self.default_last_updated,
         )
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata is None
 
@@ -137,7 +135,7 @@ class TestXmlParseHelpers:
             <versioning></versioning>
             </metadata>
         """
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata is None
 
@@ -149,7 +147,7 @@ class TestXmlParseHelpers:
             <artifactId>artifact-id</artifactId>
             </metadata>
         """
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata is None
 
@@ -164,7 +162,7 @@ class TestXmlParseHelpers:
             <body>Don't forget me this weekend!</body>
             </note>
         """
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata is None
 
@@ -179,16 +177,16 @@ class TestXmlParseHelpers:
                 }
             }
         """
-        actual_metadata: Optional[ArtifactMetadata] = try_parse_maven_group_metadata(response)
+        actual_metadata: ArtifactMetadata | None = try_parse_maven_group_metadata(response)
 
         assert actual_metadata is None
 
     @staticmethod
     def _create_xml_response(
-        latest_version: Optional[str],
-        release_version: Optional[str],
+        latest_version: str | None,
+        release_version: str | None,
         versions: list[str],
-        last_updated: Optional[int],
+        last_updated: int | None,
     ) -> str:
         latest_version_element = f"<latest>{latest_version}</latest>" if latest_version else ""
         release_version_element = f"<release>{release_version}</release>" if release_version else ""

@@ -1,12 +1,11 @@
 from pyexpat import ExpatError
-from typing import Optional
 
 import xmltodict
 
 from kataloger.data.artifact_metadata import ArtifactMetadata
 
 
-def try_parse_maven_group_metadata(response: str) -> Optional[ArtifactMetadata]:
+def try_parse_maven_group_metadata(response: str) -> ArtifactMetadata | None:
     try:
         metadata = xmltodict.parse(response.strip())
     except ExpatError:

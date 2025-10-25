@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 from unittest.mock import Mock
 
 import pytest
@@ -209,9 +208,9 @@ class TestConfigurationProvider:
 
     def __test_get_configuration(
         self,
-        args_fields_value: Optional[bool],
-        conf_fields_value: Optional[bool],
         *,
+        args_fields_value: bool | None,
+        conf_fields_value: bool | None,
         expected_value: bool,
     ) -> None:
         args_configuration_data: ConfigurationData = ConfigurationData(
@@ -251,10 +250,10 @@ class TestConfigurationProvider:
 
     @staticmethod
     def __test_get_repositories(
-        arg_library_repositories: Optional[list[Repository]],
-        arg_plugin_repositories: Optional[list[Repository]],
-        conf_library_repositories: Optional[list[Repository]],
-        conf_plugin_repositories: Optional[list[Repository]],
+        arg_library_repositories: list[Repository] | None,
+        arg_plugin_repositories: list[Repository] | None,
+        conf_library_repositories: list[Repository] | None,
+        conf_plugin_repositories: list[Repository] | None,
         expected_library_repositories: list[Repository],
         expected_plugin_repositories: list[Repository],
     ):
@@ -272,9 +271,9 @@ class TestConfigurationProvider:
 
     @staticmethod
     def __test_get_catalogs(
-        arg_catalogs: Optional[list[Catalog]],
-        conf_catalogs: Optional[list[Catalog]],
-        cwd_catalogs: Optional[list[Catalog]],
+        arg_catalogs: list[Catalog] | None,
+        conf_catalogs: list[Catalog] | None,
+        cwd_catalogs: list[Catalog] | None,
         expected_catalogs: list[Catalog],
     ):
         configuration_provider.find_cwd_catalogs = Mock(return_value=cwd_catalogs)

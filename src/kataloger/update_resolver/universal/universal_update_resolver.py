@@ -1,5 +1,3 @@
-from typing import Optional
-
 from kataloger.data.artifact.artifact import Artifact
 from kataloger.data.artifact_update import ArtifactUpdate
 from kataloger.data.metadata_repository_info import MetadataRepositoryInfo
@@ -24,7 +22,7 @@ class UniversalUpdateResolver(UpdateResolver):
         self,
         artifact: Artifact,
         repositories_metadata: list[MetadataRepositoryInfo],
-    ) -> tuple[UpdateResolution, Optional[ArtifactUpdate]]:
+    ) -> tuple[UpdateResolution, ArtifactUpdate | None]:
         recently_updated_repository = self.__most_recently_updated_repository(repositories_metadata)
         current_version_repository = self.__repository_with_current_version(artifact.version, repositories_metadata)
         repositories_to_check: list[MetadataRepositoryInfo] = []
@@ -50,7 +48,7 @@ class UniversalUpdateResolver(UpdateResolver):
         artifact: Artifact,
         version_factory: VersionFactory,
         repository_metadata: MetadataRepositoryInfo,
-    ) -> tuple[UpdateResolution, Optional[ArtifactUpdate]]:
+    ) -> tuple[UpdateResolution, ArtifactUpdate | None]:
         current_version = artifact.version
         if not version_factory.can_create(current_version):
             return UpdateResolution.CANT_RESOLVE, None
@@ -88,7 +86,7 @@ class UniversalUpdateResolver(UpdateResolver):
     def __repository_with_current_version(
         current_version: str,
         repositories_metadata: list[MetadataRepositoryInfo],
-    ) -> Optional[MetadataRepositoryInfo]:
+    ) -> MetadataRepositoryInfo | None:
         for repository_metadata in repositories_metadata:
             if current_version in repository_metadata.metadata.versions:
                 return repository_metadata

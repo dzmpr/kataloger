@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 
 @dataclass(frozen=True)
 class Catalog:
-    name: Optional[str]
+    name: str | None
     path: Path
 
     @staticmethod
